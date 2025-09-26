@@ -1,1 +1,1 @@
-Online No due portal for NIC students
+Online No due portal for NIT students
