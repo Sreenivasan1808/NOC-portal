@@ -1,1 +1,1 @@
-Online No due portal
+Online No due portal for NIC students
