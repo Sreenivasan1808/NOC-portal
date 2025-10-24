@@ -51,6 +51,8 @@ const facultyAdvisorSchema = new Schema<IFacultyAdvisor>({
     },
 });
 
-
-const FacultyAdvisor = db.model<IFacultyAdvisor>('FacultyAdvisor', facultyAdvisorSchema);
+const FacultyAdvisor = db.model<IFacultyAdvisor>(
+    'FacultyAdvisor',
+    facultyAdvisorSchema,
+);
 export default FacultyAdvisor;
