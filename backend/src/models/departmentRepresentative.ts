@@ -7,6 +7,11 @@ export interface IDeptRep extends Document {
     email: string;
     department: string;
     passwordHash: string;
+    resetPasswordToken: string;
+    resetPasswordExpires: Date;
+    otp?: string;
+    otpExpires?: Date;
+
 }
 
 const ALL_DEPARTMENTS: string[] = [...DEPARTMENTS.academic, ...DEPARTMENTS.nonAcademic];
@@ -37,6 +42,8 @@ const departmentRepresentativeSchema = new Schema<IDeptRep>({
         type: String,
         required: true,
     },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date }
 });
 
 const DepartmentRepresentative = db.model<IDeptRep>(
