@@ -1,9 +1,14 @@
 import express from 'express';
+const app = express();
+import authRoutes from './routes/authRoutes.js';
+app.use('/api/auth', authRoutes);
 import { errorHandler } from './middlewares/errorHandler.js';
 import type { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
+import passwordRoutes from './routes/passwordRoutes.js';
+app.use('/auth', passwordRoutes);
 
-const app = express();
+
 
 app.use(express.json());
 app.use(cookieParser());
