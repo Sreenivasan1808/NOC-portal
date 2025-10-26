@@ -11,6 +11,11 @@ export interface IStudent extends Document {
     program: string;
     passwordHash: string;
     hosteler: boolean;
+    resetPasswordToken: string;
+    resetPasswordExpires: Date;
+    otp?: string;
+    otpExpires?: Date;
+
 }
 
 
@@ -69,7 +74,9 @@ const studentSchema = new Schema<IStudent>({
     hosteler: {
         type: Boolean,
         required: true
-    }
+    },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date }
 });
 
 const Student = db.model<IStudent>('Student', studentSchema);
