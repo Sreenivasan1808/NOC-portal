@@ -5,10 +5,10 @@ import bcrypt from 'bcrypt';
 
 export const forgotPassword = async (req: Request, res: Response) => {
   try {
-    const { emailOrRoll } = req.body;
+    const { username } = req.body;
 
     const user = await Student.findOne({
-      $or: [{ email: emailOrRoll }, { rollno: emailOrRoll }],
+      $or: [{ email: username }, { rollno: username }],
     });
 
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -37,10 +37,10 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
 export const verifyOtp = async (req: Request, res: Response) => {
   try {
-    const { emailOrRoll, otp } = req.body;
+    const { username, otp } = req.body;
 
     const user = await Student.findOne({
-      $or: [{ email: emailOrRoll }, { rollno: emailOrRoll }],
+      $or: [{ email: username }, { rollno: username }],
     });
 
     if (!user || !user.otp || !user.otpExpires)
@@ -57,18 +57,25 @@ export const verifyOtp = async (req: Request, res: Response) => {
 
 export const resetPassword = async (req: Request, res: Response) => {
   try {
-    const { emailOrRoll, newPassword } = req.body;
+    const { username, newPassword } = req.body;
 
     const user = await Student.findOne({
-      $or: [{ email: emailOrRoll }, { rollno: emailOrRoll }],
+      $or: [{ email: username }, { rollno: username }],
     });
 
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     const hashed = await bcrypt.hash(newPassword, 10);
     user.passwordHash = hashed;
-    user.otp = undefined;
-    user.otpExpires = undefined;
+    // remove fields from the in-memory document so save() won't re-add them
+    delete (user as any).otp;
+    delete (user as any).otpExpires;
+
+    // also unset them in the DB to be safe
+    await Student.updateOne(
+      { _id: user._id },
+      { $unset: { otp: "", otpExpires: "" } }
+    );
     await user.save();
 
     res.json({ message: 'Password reset successful.' });
