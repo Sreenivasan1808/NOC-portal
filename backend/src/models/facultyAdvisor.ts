@@ -8,6 +8,10 @@ export interface IFacultyAdvisor extends Document {
     department: string;
     program: string;
     passwordHash: string;
+    resetPasswordToken: string;
+    resetPasswordExpires: Date;
+    otp?: string;
+    otpExpires?: Date;
 }
 
 const facultyAdvisorSchema = new Schema<IFacultyAdvisor>({
@@ -49,6 +53,8 @@ const facultyAdvisorSchema = new Schema<IFacultyAdvisor>({
         type: String,
         required: true,
     },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date }
 });
 
 const FacultyAdvisor = db.model<IFacultyAdvisor>(
