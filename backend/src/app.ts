@@ -1,10 +1,20 @@
 import express from 'express';
 import { errorHandler } from './middlewares/errorHandler.js';
 import type { Request, Response, NextFunction } from 'express';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
+
+// Auth, Logout, and Protected routes
+import authRouter from './routes/auth.js';
+import logoutRouter from './routes/logout.js';
+import protectedRouter from './routes/protected.js';
+app.use('/api/auth', authRouter);
+app.use('/api/auth', logoutRouter);
+app.use('/api', protectedRouter);
 
 // Routes
 
