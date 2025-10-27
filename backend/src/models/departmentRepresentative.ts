@@ -1,8 +1,7 @@
-import { Schema, Document } from 'mongoose';
-import db from '../db.js';
+import mongoose from '../mongooseClient.js';
 import { DEPARTMENTS } from '../constants.js';
 
-export interface IDeptRep extends Document {
+export interface IDeptRep extends mongoose.Document {
     name: string;
     email: string;
     department: string;
@@ -14,7 +13,7 @@ export interface IDeptRep extends Document {
 
 const ALL_DEPARTMENTS: string[] = [...DEPARTMENTS.academic, ...DEPARTMENTS.nonAcademic];
 
-const departmentRepresentativeSchema = new Schema<IDeptRep>({
+const departmentRepresentativeSchema = new mongoose.Schema<IDeptRep>({
     name: {
         type: String,
         required: true,
@@ -44,7 +43,7 @@ const departmentRepresentativeSchema = new Schema<IDeptRep>({
     otpExpires: { type: Date }
 });
 
-const DepartmentRepresentative = db.model<IDeptRep>(
+const DepartmentRepresentative = mongoose.model<IDeptRep>(
     'DepartmentRepresentative',
     departmentRepresentativeSchema,
 );

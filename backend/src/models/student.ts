@@ -1,8 +1,7 @@
-import { Document, Schema } from 'mongoose';
-import db from '../db.js';
+import mongoose from '../mongooseClient.js';
 import { AcademicDeptPrograms } from '../constants.js';
 
-export interface IStudent extends Document {
+export interface IStudent extends mongoose.Document {
     name: string;
     rollNumber: string;
     email: string;
@@ -13,12 +12,11 @@ export interface IStudent extends Document {
     hosteler: boolean;
     otp?: string;
     otpExpires?: Date;
-
 }
 
 
 
-const studentSchema = new Schema<IStudent>({
+const studentSchema = new mongoose.Schema<IStudent>({
     name: {
         type: String,
         required: true,
@@ -77,5 +75,5 @@ const studentSchema = new Schema<IStudent>({
     otpExpires: { type: Date }
 });
 
-const Student = db.model<IStudent>('Student', studentSchema);
+const Student = mongoose.model<IStudent>('Student', studentSchema);
 export default Student;

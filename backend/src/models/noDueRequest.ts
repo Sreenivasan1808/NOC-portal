@@ -1,5 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
-import db from '../db.js';
+import mongoose from '../mongooseClient.js';
 
 interface IFacultyAdvisorApproval {
     approverId: string;
@@ -19,7 +18,7 @@ interface IDepartmentApproval {
     date?: Date;
 }
 
-export interface INoDueReq extends Document {
+export interface INoDueReq extends mongoose.Document {
     studentRollNumber: string;
     facultyAdvisorApproval: IFacultyAdvisorApproval;
     departmentApprovals: IDepartmentApproval[];
@@ -34,7 +33,7 @@ export interface INoDueReq extends Document {
     updatedAt?: Date;
 }
 
-const noDueReqSchema = new Schema<INoDueReq>(
+const noDueReqSchema = new mongoose.Schema<INoDueReq>(
     {
         studentRollNumber: { type: String, required: true },
 
@@ -82,5 +81,5 @@ const noDueReqSchema = new Schema<INoDueReq>(
     { timestamps: true },
 );
 
-const NoDueReq = db.model<INoDueReq>('NoDueReq', noDueReqSchema);
+const NoDueReq = mongoose.model<INoDueReq>('NoDueReq', noDueReqSchema);
 export default NoDueReq;
