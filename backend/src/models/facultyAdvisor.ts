@@ -1,20 +1,17 @@
-import { Document, Schema } from 'mongoose';
-import db from '../db.js';
+import mongoose from '../mongooseClient.js';
 import { AcademicDeptPrograms } from '../constants.js';
 
-export interface IFacultyAdvisor extends Document {
+export interface IFacultyAdvisor extends mongoose.Document {
     name: string;
     email: string;
     department: string;
     program: string;
     passwordHash: string;
-    resetPasswordToken: string;
-    resetPasswordExpires: Date;
     otp?: string;
     otpExpires?: Date;
 }
 
-const facultyAdvisorSchema = new Schema<IFacultyAdvisor>({
+const facultyAdvisorSchema = new mongoose.Schema<IFacultyAdvisor>({
     name: {
         type: String,
         required: true,
@@ -53,11 +50,11 @@ const facultyAdvisorSchema = new Schema<IFacultyAdvisor>({
         type: String,
         required: true,
     },
-    resetPasswordToken: { type: String },
-    resetPasswordExpires: { type: Date }
+    otp: { type: String },
+    otpExpires: { type: Date }
 });
 
-const FacultyAdvisor = db.model<IFacultyAdvisor>(
+const FacultyAdvisor = mongoose.model<IFacultyAdvisor>(
     'FacultyAdvisor',
     facultyAdvisorSchema,
 );
