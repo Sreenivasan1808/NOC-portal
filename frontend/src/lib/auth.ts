@@ -1,33 +1,62 @@
+"use server";
 import axios from "axios";
 import { cookies } from "next/headers";
 
 export async function login(formData: FormData) {
-  "use server";
-  // Verify credentials && get the user
+  try {
+    const userData = {
+      username: formData.get("username"),
+      password: formData.get("password"),
+    };
 
-  const userData = {
-    username: formData.get("username"),
-    password: formData.get("password"),
-  };
-  const response = await axios.post(process.env.SERVER_URL || "", userData);
+    const response = await axios.post(
+      `${process.env.SERVER_URL}/api/auth/login`,
+      userData
+    );
 
-  if(response.status == 400){
-    return {error: response.data.message};
+    const { session }: { session: string } = response.data;
+
+    // Save session cookie
+    (await cookies()).set("session", session, {
+      httpOnly: true,
+      secure: true,
+    });
+
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err) && err.response) {
+      // Backend responded with error (401/400/500)
+      const data = err.response?.data as { message?: string } | undefined;
+      const message = data?.message ?? "Login failed";
+      return { error: message };
+    }
+
+    // Network failure, CORS issue, server offline, etc.
+    console.error("Unexpected error:", err);
+    return { error: "Something went wrong" };
   }
+}
 
-  // Create the session
-  const { user, session }: { user: object; session: string } = response.data;
+export async function getCurrentUser() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("session")?.value;
 
-  //save user data in localstorage
-  localStorage.setItem("user", JSON.stringify(user));
+  if (!session) return null;
 
-  // Save the session in a cookie
-  (await cookies()).set("session", session, { httpOnly: true });
+  try {
+    const response = await axios.get(`${process.env.SERVER_URL}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${session}` },
+    });
+    return response.data.user;
+  } catch (err) {
+    // session expired or invalid
+    return null;
+  }
 }
 
 export async function logout() {
   // Destroy the session
-  localStorage.removeItem("user");
+  "use server";
+  // localStorage.removeItem("user");
   (await cookies()).set("session", "", { expires: new Date(0) });
 }
 
@@ -37,9 +66,3 @@ export async function getSession() {
   if (!session) return null;
   return session;
 }
-
-export const getRole = (): string | null => {
-  if (!localStorage.getItem("user")) return null;
-  const user = JSON.parse(localStorage.getItem("user") || "");
-  return user.role;
-};

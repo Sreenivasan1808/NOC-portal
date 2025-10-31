@@ -1,11 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f3fcf8;
-  --foreground: #171717;
-  --primary: #3dd17d;
-  --secondary: #98b9e7;
-  --accent: #5e62d9;
+  --background: oklch(0.9832 0.0108 167.81);
+  --foreground: oklch(0.2046 0 129.63);
+  --primary: oklch(0.7638 0.1724 153.69);
+  --secondary: oklch(0.7779 0.0753 256.74);
+  --accent: oklch(0.5572 0.1785 277.45);
+  --background-muted: oklch(92.324% 0.0108 168.385);
+  --foreground-muted: oklch(0.3046 0 129.63);
 }
 
 @theme inline {
@@ -14,17 +16,21 @@
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
   --color-accent: var(--accent);
+  --color-background-muted: var(--background-muted);
+  --color-foreground-muted: var(--foreground-muted);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #262827;
-    --foreground: #ededed;
-    --primary: #2ec26e;
-    --secondary: #183967;
-    --accent: #262aa1;
+    --background: oklch(0.2744 0.0034 164.81);
+    --foreground: oklch(0.9461 0 0);
+    --primary: oklch(0.7194 0.1713 152.88);
+    --secondary: oklch(0.3463 0.0894 257.31);
+    --accent: oklch(0.3762 0.1855 271.74);
+    --background-muted: oklch(0.3744 0.0034 164.81);
+    --foreground-muted: oklch(0.8461 0 0);
   }
 }
 

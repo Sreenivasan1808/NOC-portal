@@ -5,7 +5,9 @@ import LoginForm from "./LoginForm"; // separate client form component
 
 export default async function Login() {
   const session = await getSession();
-  if (session) redirect("/dashboard");
+  if (session) {
+    redirect("/dashboard");
+  }
 
   return (
     <div className="flex min-h-screen w-full">
@@ -26,7 +28,8 @@ export default async function Login() {
       </div>
 
       {/* Right Login Section */}
-      <div className="w-[50%] flex flex-col justify-center items-center gap-4 p-4">
+      <div className="w-[50%] flex flex-col justify-center items-center gap-4 p-4"
+      >
         <LoginForm />
       </div>
     </div>

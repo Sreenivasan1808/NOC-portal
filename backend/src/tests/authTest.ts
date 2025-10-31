@@ -11,7 +11,7 @@ const studentData = [
   {
     name: "Aarav Patel",
     rollNumber: "CSE2023001",
-    email: "aarav.patel@university.edu",
+    email: "sreenivasan1808@gmail.com",
     facultyAdvisorName: "Dr. Meera Nair",
     department: "CSE",
     program: AcademicDeptPrograms.CSE?.[0] ?? "",
@@ -185,7 +185,7 @@ export const seedStudents = async () => {
       })
     );
 
-    await Student.insertMany(studentsWithHashedPasswords);
+    await Student.insertMany(studentsWithHashedPasswords);9
     console.log("🎉 Successfully inserted student records!");
 
   } catch (error) {
