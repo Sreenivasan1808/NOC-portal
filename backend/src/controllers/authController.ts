@@ -207,3 +207,4 @@ export const getUser = async (req: Request, res: Response) => {
         return res.status(401).json({ message: 'Token expired or invalid.' });
     }
 };
+
