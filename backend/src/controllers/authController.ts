@@ -121,14 +121,14 @@ export const handleLogin = async (req: Request, res: Response) => {
     let user: any = await Student.findOne(query);
     console.log(user);
 
-    let model: any = Student;
+    let role: string = 'student';
     if (!user) {
         user = await FacultyAdvisor.findOne(query);
-        model = FacultyAdvisor;
+        role = 'facultyadv';
     }
     if (!user) {
         user = await DepartmentRepresentative.findOne(query);
-        model = DepartmentRepresentative;
+        role = 'deptrep';
     }
     if (!user) {
         return res.status(401).json({ message: 'Invalid credentials.' });
@@ -137,22 +137,73 @@ export const handleLogin = async (req: Request, res: Response) => {
     if (!valid) {
         return res.status(401).json({ message: 'Invalid credentials.' });
     }
-    const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, {
-        expiresIn: '1d',
-    });
-    // res.cookie('token', token, {
-    //     httpOnly: true,
-    //     secure: process.env.NODE_ENV === 'production',
-    //     sameSite: 'strict',
-    //     maxAge: 24 * 60 * 60 * 1000 // 1 day
-    // });
-    const userObj = (user as any).toObject
-        ? (user as any).toObject()
-        : { ...(user as any) };
-    const { passwordHash, otp, otpExpires, ...sanitizedUser } = userObj;
+    const token = jwt.sign(
+        { id: user._id, email: user.email, role: role },
+        JWT_SECRET,
+        {
+            expiresIn: '1d',
+        },
+    );
+
     res.json({
         message: 'Login successful.',
-        user: sanitizedUser,
         session: token,
     });
+};
+
+export const getUser = async (req: Request, res: Response) => {
+    try {
+        const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
+        const authHeader = req.headers.authorization;
+
+        console.log(authHeader);
+        
+
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ message: 'No token provided.' });
+        }
+
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ message: 'No token provided.' });
+        }
+        const decoded: any = jwt.verify(token, JWT_SECRET);
+
+        console.log(decoded);
+        
+
+        if (!decoded?.id) {
+            return res.status(401).json({ message: 'Invalid token.' });
+        }
+
+        const { id, role } = decoded;
+        let user: any;
+
+        if (role === 'student') {
+            user = await Student.findById(id);
+        } else if (role === 'facultyadv') {
+            user = await FacultyAdvisor.findById(id);
+        } else if (role === 'deptrep') {
+            user = await DepartmentRepresentative.findById(id);
+        }
+        //  else if(role === 'admin'){
+            
+        // }
+
+        console.log(user);
+        
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const userObj = user.toObject();
+        const { passwordHash, otp, otpExpires, ...sanitizedUser } = userObj;
+
+        const userRes = { ...sanitizedUser, role };
+
+        return res.json({ user: userRes });
+    } catch (error) {
+        return res.status(401).json({ message: 'Token expired or invalid.' });
+    }
 };

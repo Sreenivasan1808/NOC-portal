@@ -5,22 +5,27 @@ import { toast } from "sonner";
 import { loginAction } from "./actions";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 const initialState = { success: false, error: undefined };
 
-export default function LoginForm() {
-  const [state, formAction, isPending] = useActionState(loginAction, initialState);
-  const router = useRouter();
+const LoginForm = () => {
+  const [state, formAction, isPending] = useActionState(
+    loginAction,
+    initialState
+  );
 
-  // Run toast or redirect based on server result
-  useEffect(() => {
-    if (state.error) toast.error(state.error);
+    useEffect(() => {
+    if (!state) return;
+
+    if (state.error) {
+      toast.error(state.error);
+    }
+
     if (state.success) {
       toast.success("Login successful");
-      router.push("/dashboard");
     }
-  }, [state, router]);
+  }, [state]);
+
 
   return (
     <form
@@ -39,6 +44,7 @@ export default function LoginForm() {
           type="text"
           name="username"
           required
+          autoComplete="username"
           placeholder="Roll no. / Institute Email"
           className="w-full border border-gray-300/30 rounded-xl p-2 focus:outline-none focus:border-primary hover:bg-background/70"
         />
@@ -58,6 +64,7 @@ export default function LoginForm() {
       <input
         type="submit"
         value="Login"
+        disabled={isPending}
         className="w-full text-center rounded-xl bg-primary/80 text-foreground px-4 py-2 hover:cursor-pointer hover:bg-primary/70"
       />
 
@@ -67,17 +74,8 @@ export default function LoginForm() {
       >
         Forgot password? Click here
       </Link>
-
-      {/* <button
-        onClick={() =>
-          toast.error("hello", {
-            className: "bg-red-600 text-white",
-            position: "top-center",
-          })
-        }
-      >
-        click
-      </button> */}
     </form>
   );
-}
+};
+
+export default LoginForm;
