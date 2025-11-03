@@ -6,6 +6,7 @@ export interface IStudent extends mongoose.Document {
     rollNumber: string;
     email: string;
     facultyAdvisorName: string;
+    facultyAdvisorId: mongoose.Types.ObjectId;
     department: string;
     program: string;
     passwordHash: string;
@@ -36,6 +37,9 @@ const studentSchema = new mongoose.Schema<IStudent>({
         lowercase: true,
         trim: true,
         match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email address'],
+    },
+    facultyAdvisorId:{
+
     },
     facultyAdvisorName: {
         type: String,
