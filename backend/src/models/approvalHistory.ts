@@ -1,8 +1,7 @@
-import { Schema, model, Document, Types } from 'mongoose';
-import db from '../db.js';
+import mongoose from '../mongooseClient.js';
 
-export interface IApprovalHistory extends Document {
-    noDueReqId: Types.ObjectId;
+export interface IApprovalHistory extends mongoose.Document {
+    noDueReqId: mongoose.Types.ObjectId;
     actorId: string;
     actorRole: 'Student' | 'FacultyAdvisor' | 'DeptRep' | 'Admin';
     action: 'Submitted' | 'Approved' | 'Rejected';
@@ -13,10 +12,10 @@ export interface IApprovalHistory extends Document {
     updatedAt?: Date;
 }
 
-const approvalHistorySchema = new Schema<IApprovalHistory>(
+const approvalHistorySchema = new mongoose.Schema<IApprovalHistory>(
     {
         noDueReqId: {
-            type: Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: 'NoDueReq',
             required: true,
         },
@@ -38,7 +37,7 @@ const approvalHistorySchema = new Schema<IApprovalHistory>(
     { timestamps: true },
 );
 
-const ApprovalHistory = db.model<IApprovalHistory>(
+const ApprovalHistory = mongoose.model<IApprovalHistory>(
     'ApprovalHistory',
     approvalHistorySchema,
 );

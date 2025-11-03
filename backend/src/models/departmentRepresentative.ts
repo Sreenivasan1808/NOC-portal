@@ -1,14 +1,11 @@
-import { Schema, Document } from 'mongoose';
-import db from '../db.js';
+import mongoose from '../mongooseClient.js';
 import { DEPARTMENTS } from '../constants.js';
 
-export interface IDeptRep extends Document {
+export interface IDeptRep extends mongoose.Document {
     name: string;
     email: string;
     department: string;
     passwordHash: string;
-    resetPasswordToken: string;
-    resetPasswordExpires: Date;
     otp?: string;
     otpExpires?: Date;
 
@@ -16,7 +13,7 @@ export interface IDeptRep extends Document {
 
 const ALL_DEPARTMENTS: string[] = [...DEPARTMENTS.academic, ...DEPARTMENTS.nonAcademic];
 
-const departmentRepresentativeSchema = new Schema<IDeptRep>({
+const departmentRepresentativeSchema = new mongoose.Schema<IDeptRep>({
     name: {
         type: String,
         required: true,
@@ -42,11 +39,11 @@ const departmentRepresentativeSchema = new Schema<IDeptRep>({
         type: String,
         required: true,
     },
-    resetPasswordToken: { type: String },
-    resetPasswordExpires: { type: Date }
+    otp: { type: String },
+    otpExpires: { type: Date }
 });
 
-const DepartmentRepresentative = db.model<IDeptRep>(
+const DepartmentRepresentative = mongoose.model<IDeptRep>(
     'DepartmentRepresentative',
     departmentRepresentativeSchema,
 );
