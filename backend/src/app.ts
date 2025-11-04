@@ -5,10 +5,19 @@ import { errorHandler } from './middlewares/errorHandler';
 import type { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
 
+import cors from 'cors'
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+// Allow CORS from the frontend during development (adjust or set CLIENT_ORIGIN in production)
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:3000';
+app.use(
+  cors({
+    origin: CLIENT_ORIGIN,
+    credentials: true,
+  })
+);
 
 // Global error handler (should be after routes)
 
