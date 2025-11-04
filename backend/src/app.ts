@@ -1,7 +1,7 @@
 import express from 'express';
-import authRoutes from "./routes/authRoutes.js"
-import noDueReqRoutes from "./routes/noDueReqRoutes.js"
-import { errorHandler } from './middlewares/errorHandler.js';
+import authRoutes from "./routes/authRoutes"
+import noDueReqRoutes from "./routes/noDueReqRoutes"
+import { errorHandler } from './middlewares/errorHandler';
 import type { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
 
@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Global error handler (should be after routes)
-app.use(errorHandler);
+
 
 
 //sample route to test the server. Remove later
@@ -22,5 +22,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/requests", noDueReqRoutes);
+
+app.use(errorHandler);
 
 export default app;

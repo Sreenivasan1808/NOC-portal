@@ -1,9 +1,9 @@
-import Student from "../models/student.js";
-import FacultyAdvisor from "../models/facultyAdvisor.js";
-import DepartmentRepresentative from "../models/departmentRepresentative.js";
+import Student from "../models/student";
+import FacultyAdvisor from "../models/facultyAdvisor";
+import DepartmentRepresentative from "../models/departmentRepresentative";
 
 import bcrypt from "bcrypt";
-import { AcademicDeptPrograms } from "../constants.js";
+import { AcademicDeptPrograms } from "../constants";
 
 
 // Sample data with plaintext passwords
@@ -11,6 +11,7 @@ const studentData = [
   {
     name: "Aarav Patel",
     rollNumber: "CSE2023001",
+    email: "aarav@gmail.com",
     facultyAdvisorName: "Dr. Meera Nair",
     department: "CSE",
     program: AcademicDeptPrograms.CSE?.[0] ?? "",

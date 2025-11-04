@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import NoDueReq from '../models/noDueRequest.js';
+import NoDueReq from '../models/noDueRequest';
 
 const ACTIVE_STATUSES = new Set([
   'Pending',

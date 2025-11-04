@@ -1,4 +1,4 @@
-import mongoose from '../mongooseClient.js';
+import mongoose from '../mongooseClient';
 
 interface IFacultyAdvisorApproval {
     approverId: string;

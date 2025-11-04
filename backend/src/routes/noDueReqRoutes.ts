@@ -1,6 +1,6 @@
 import express from 'express';
-import { protect } from '../middlewares/jwtAuth.js';
-import { getStudentRequests } from '../controllers/noDueReqController.js';
+import { protect } from '../middlewares/jwtAuth';
+import { getStudentRequests } from '../controllers/noDueReqController';
 
 const router = express.Router();
 
