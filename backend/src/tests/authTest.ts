@@ -11,7 +11,6 @@ const studentData = [
   {
     name: "Aarav Patel",
     rollNumber: "CSE2023001",
-    email: "sreenivasan1808@gmail.com",
     facultyAdvisorName: "Dr. Meera Nair",
     department: "CSE",
     program: AcademicDeptPrograms.CSE?.[0] ?? "",

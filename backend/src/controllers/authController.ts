@@ -164,9 +164,12 @@ export const changePassword = async (req: Request, res: Response) => {
     }
 
     // Find user by ID
-    const user = await userId.findById(userId);
+    let user: any = await Student.findById(userId);
+    if (!user) user = await FacultyAdvisor.findById(userId);
+    if (!user) user = await DepartmentRepresentative.findById(userId);
+
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    return res.status(404).json({ message: "User not found" });
     }
 
     // Compare current password
@@ -243,3 +246,4 @@ export const getUser = async (req: Request, res: Response) => {
         return res.status(401).json({ message: 'Token expired or invalid.' });
     }
 };
+
