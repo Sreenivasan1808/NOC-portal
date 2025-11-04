@@ -1,5 +1,6 @@
 import express from 'express';
 import authRoutes from "./routes/authRoutes.js"
+import noDueReqRoutes from "./routes/noDueReqRoutes.js"
 import { errorHandler } from './middlewares/errorHandler.js';
 import type { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
@@ -20,5 +21,6 @@ app.get('/', (req: Request, res: Response) => {
 
 
 app.use("/api/auth", authRoutes);
+app.use("/api/requests", noDueReqRoutes);
 
 export default app;
