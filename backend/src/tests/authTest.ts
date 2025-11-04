@@ -11,7 +11,6 @@ const studentData = [
   {
     name: "Aarav Patel",
     rollNumber: "CSE2023001",
-    email: "sreenivasan1808@gmail.com",
     facultyAdvisorName: "Dr. Meera Nair",
     department: "CSE",
     program: AcademicDeptPrograms.CSE?.[0] ?? "",
@@ -21,7 +20,7 @@ const studentData = [
   {
     name: "Isha Sharma",
     rollNumber: "EEE2023002",
-    email: "isha.sharma@university.edu",
+    email: "sreekshasree270@gmail.com",
     facultyAdvisorName: "Dr. R. Krishnan",
     department: "EEE",
     program: AcademicDeptPrograms.EEE?.[0],

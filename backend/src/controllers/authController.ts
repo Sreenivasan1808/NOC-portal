@@ -150,6 +150,45 @@ export const handleLogin = async (req: Request, res: Response) => {
         session: token,
     });
 };
+export const changePassword = async (req: Request, res: Response) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user?.id; // assuming authentication middleware adds user info to req.user
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: "Please provide both current and new passwords" });
+    }
+
+    // Find user by ID
+    let user: any = await Student.findById(userId);
+    if (!user) user = await FacultyAdvisor.findById(userId);
+    if (!user) user = await DepartmentRepresentative.findById(userId);
+
+    if (!user) {
+    return res.status(404).json({ message: "User not found" });
+    }
+
+    // Compare current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Current password is incorrect" });
+    }
+
+    // Hash and update new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    return res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 export const getUser = async (req: Request, res: Response) => {
     try {
@@ -207,3 +246,4 @@ export const getUser = async (req: Request, res: Response) => {
         return res.status(401).json({ message: 'Token expired or invalid.' });
     }
 };
+
