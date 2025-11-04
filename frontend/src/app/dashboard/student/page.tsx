@@ -1,5 +1,5 @@
 import Navbar from "@/components/navbar";
-import { getCurrentUser, getSession } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import React from "react";
 import CurrentRequest from "./current-req";
