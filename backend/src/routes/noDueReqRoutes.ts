@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticateJWT } from '../middlewares/jwtAuth';
-import { getStudentRequests, createNewRequest } from '../controllers/noDueReqController';
+import { getStudentRequests, createNewRequest, approveRequest, rejectRequest } from '../controllers/noDueReqController';
 
 const router = express.Router();
 
