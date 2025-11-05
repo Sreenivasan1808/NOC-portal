@@ -7,6 +7,14 @@ export default function Home() {
       <main className="flex flex-col w-full items-center sm:items-start">
         {redirect("/login")}
       </main>
-    </div>
-  );
-}
+   </div>
+    
+   );
+ }
+
+
+
+
+
+
+
