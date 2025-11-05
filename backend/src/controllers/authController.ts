@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express';
-import Student from '../models/student.js';
-import FacultyAdvisor from '../models/facultyAdvisor.js';
-import DepartmentRepresentative from '../models/departmentRepresentative.js';
-import sendEmail from '../utils/sendEmail.js';
+import Student from '../models/student';
+import FacultyAdvisor from '../models/facultyAdvisor';
+import DepartmentRepresentative from '../models/departmentRepresentative';
+import sendEmail from '../utils/sendEmail';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -153,7 +153,7 @@ export const handleLogin = async (req: Request, res: Response) => {
 export const changePassword = async (req: Request, res: Response) => {
   try {
     const { currentPassword, newPassword } = req.body;
-    const userId = req.user?.id; // assuming authentication middleware adds user info to req.user
+    const userId = (req as any).user?.id; // assuming authentication middleware adds user info to req.user
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -173,14 +173,14 @@ export const changePassword = async (req: Request, res: Response) => {
     }
 
     // Compare current password
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    const isMatch = await bcrypt.compare(currentPassword, user.passwordHash);
     if (!isMatch) {
       return res.status(400).json({ message: "Current password is incorrect" });
     }
 
     // Hash and update new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
+    user.passwordHash = hashedPassword;
     await user.save();
 
     return res.status(200).json({ message: "Password changed successfully" });

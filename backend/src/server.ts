@@ -1,15 +1,24 @@
-import app from './app.js';
-import config from './config/config.js';
-import { connectDB } from "./db.js";
-import { seedStudents, seedFacultyAdvisors } from './tests/authTest.js';
+import dotenv from 'dotenv';
+dotenv.config();
+import app from './app';
+import config from './config/config';
+import { connectDB } from "./db";
+import { seedStudents, seedFacultyAdvisors } from './tests/authTest';
+
 
 const startServer = async () => {
-  await connectDB(); // wait until connected
-  await seedStudents();
-  await seedFacultyAdvisors();
-  app.listen(config.port, () => {
-    console.log(`🚀 Server running on port ${config.port}`);
-  });
+  try {
+    await connectDB();
+    await seedStudents();
+    await seedFacultyAdvisors();
+
+    app.listen(config.port, () => {
+      console.log(`🚀 Server running on port ${config.port}`);
+    });
+  } catch (err) {
+    console.error("❌ Startup error:", err);
+    process.exit(1);
+  }
 };
 
 startServer();
