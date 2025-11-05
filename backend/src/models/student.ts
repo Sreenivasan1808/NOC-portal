@@ -1,5 +1,5 @@
-import mongoose from '../mongooseClient.js';
-import { AcademicDeptPrograms } from '../constants.js';
+import mongoose from '../mongooseClient';
+import { AcademicDeptPrograms } from '../constants';
 
 export interface IStudent extends mongoose.Document {
     name: string;

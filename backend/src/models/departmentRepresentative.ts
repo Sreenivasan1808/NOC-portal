@@ -1,5 +1,5 @@
-import mongoose from '../mongooseClient.js';
-import { DEPARTMENTS } from '../constants.js';
+import mongoose from '../mongooseClient';
+import { DEPARTMENTS } from '../constants';
 
 export interface IDeptRep extends mongoose.Document {
     name: string;

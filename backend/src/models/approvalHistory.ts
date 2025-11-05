@@ -1,4 +1,4 @@
-import mongoose from '../mongooseClient.js';
+import mongoose from '../mongooseClient';
 
 export interface IApprovalHistory extends mongoose.Document {
     noDueReqId: mongoose.Types.ObjectId;
