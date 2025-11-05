@@ -5,7 +5,6 @@ import { useState } from "react";
 const FacultyAdvisorDashboard = () => {
   const [activeTab, setActiveTab] = useState("requests");
   return (
-
     <div className="min-h-screen flex bg-gray-100">
       {/* Sidebar */}
       <aside className="w-64 bg-white shadow-md p-6 space-y-6">
@@ -49,7 +48,7 @@ const FacultyAdvisorDashboard = () => {
         <main className="flex-1 p-8 space-y-6 overflow-y-auto">
           {activeTab === "students" && (
             <div>
-              <h2 className="text-2xl font-bold mb-4">Students</h2>
+              <h2 className="text-2xl font-bold mb-4 text-blue-700">Students</h2>
               <p className="text-gray-600">
                 List of students will be displayed here.
               </p>
@@ -58,8 +57,8 @@ const FacultyAdvisorDashboard = () => {
 
           {activeTab === "requests" && (
             <div>
-              <h1 className="text-3xl font-bold mb-6">
-                Faculty Advisor Dashboard
+              <h1 className="text-3xl font-bold mb-6 text-blue-700">
+                Requests
               </h1>
 
               {/* Example Request Cards */}
@@ -68,7 +67,7 @@ const FacultyAdvisorDashboard = () => {
                 <div className="bg-white shadow rounded p-6 w-full">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h2 className="text-2xl font-bold">John Doe</h2>
+                      <h2 className="text-2xl font-bold text-blue-600">John Doe</h2>
                       <p className="text-sm text-gray-500 mt-1">Request ID: 1</p>
                       <p className="text-gray-600 mt-1">
                         Department: Computer Science
@@ -84,7 +83,9 @@ const FacultyAdvisorDashboard = () => {
 
                   {/* Approve / Reject / Edit UI */}
                   <div className="mt-4 space-y-2">
-                    <label className="block font-semibold">Decision:</label>
+                    <label className="block font-semibold text-blue-600">
+                      Decision:
+                    </label>
                     <div className="flex items-center space-x-4">
                       <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
                         ✅ Approve
@@ -96,7 +97,9 @@ const FacultyAdvisorDashboard = () => {
                         ✏️ Edit
                       </button>
                     </div>
-                    <label className="block font-semibold mt-2">Comments:</label>
+                    <label className="block font-semibold mt-2 text-blue-600">
+                      Comments:
+                    </label>
                     <textarea
                       className="w-full border rounded p-2"
                       placeholder="Enter comments..."
@@ -109,7 +112,9 @@ const FacultyAdvisorDashboard = () => {
                 <div className="bg-white shadow rounded p-6 w-full">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h2 className="text-2xl font-bold">Jane Smith</h2>
+                      <h2 className="text-2xl font-bold text-blue-600">
+                        Jane Smith
+                      </h2>
                       <p className="text-sm text-gray-500 mt-1">Request ID: 2</p>
                       <p className="text-gray-600 mt-1">
                         Department: Electronics
@@ -124,13 +129,17 @@ const FacultyAdvisorDashboard = () => {
                   </div>
 
                   <div className="mt-4 space-y-2">
-                    <label className="block font-semibold">Decision:</label>
+                    <label className="block font-semibold text-blue-600">
+                      Decision:
+                    </label>
                     <div className="flex items-center space-x-4">
                       <button className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
                         ✏️ Edit
                       </button>
                     </div>
-                    <label className="block font-semibold mt-2">Comments:</label>
+                    <label className="block font-semibold mt-2 text-blue-600">
+                      Comments:
+                    </label>
                     <textarea
                       disabled
                       className="w-full rounded p-2"
@@ -143,23 +152,11 @@ const FacultyAdvisorDashboard = () => {
               </div>
             </div>
           )}
-
-          {activeTab === "profile" && (
-            <div>
-              <h2 className="text-2xl font-bold mb-4">Profile</h2>
-              <p className="text-gray-600">
-                Faculty details and settings can be managed here.
-              </p>
-            </div>
-          )}
         </main>
       </div>
     </div>
-
-
-
-
-
+  );
+}
 
 
 
@@ -262,8 +259,7 @@ const FacultyAdvisorDashboard = () => {
     //     {/* Add more request cards similarly */}
     //   </div>
     // </div> 
-  );
-}
+
 
 export default FacultyAdvisorDashboard
 
