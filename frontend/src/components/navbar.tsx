@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { getCurrentUser, logout } from "@/lib/auth";
 import Image from "next/image";
 import Link from "next/link";
-import { CircleUserRound, LogOut, Pen } from "lucide-react";
+import { CircleUserRound, LogOut } from "lucide-react";
 import { ChangePassword } from "./change-password";
 
 export default function Navbar() {

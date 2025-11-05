@@ -44,7 +44,7 @@ const studentData = [
     email: "diya.menon@university.edu",
     facultyAdvisorName: "Dr. Meera Nair",
     department: "CSE",
-    program: AcademicDeptPrograms.CSE?.[3] ?? "", // AI & Data Analytics
+    program: AcademicDeptPrograms.CSE?.[0] ?? "", // AI & Data Analytics
     password: "diya@321",
     hosteler: false,
   },

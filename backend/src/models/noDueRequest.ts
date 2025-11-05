@@ -22,13 +22,7 @@ export interface INoDueReq extends mongoose.Document {
     studentRollNumber: string;
     facultyAdvisorApproval: IFacultyAdvisorApproval;
     departmentApprovals: IDepartmentApproval[];
-    status:
-        | 'Pending'
-        | 'In Review'
-        | 'Partially Approved'
-        | 'Approved'
-        | 'Rejected'
-        | 'Cancelled';
+    status: 'Pending' | 'FA Approved' | 'Fully Approved' | 'Rejected';
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -67,14 +61,7 @@ const noDueReqSchema = new mongoose.Schema<INoDueReq>(
 
         status: {
             type: String,
-            enum: [
-                'Pending',
-                'In Review',
-                'Partially Approved',
-                'Approved',
-                'Rejected',
-                'Cancelled',
-            ],
+            enum: ['Pending', 'FA Approved', 'Fully Approved', 'Rejected'],
             default: 'Pending',
         },
     },
