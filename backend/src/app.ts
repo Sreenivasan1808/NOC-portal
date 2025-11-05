@@ -4,6 +4,8 @@ import noDueReqRoutes from "./routes/noDueReqRoutes"
 import { errorHandler } from './middlewares/errorHandler';
 import type { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
+import adminRoutes from './routes/adminRoutes.js';
+
 
 import cors from 'cors'
 import userRoutes from './routes/userRoutes';
@@ -20,6 +22,7 @@ app.use(
   })
 );
 
+
 // Global error handler (should be after routes)
 
 
@@ -31,6 +34,7 @@ app.get('/', (req: Request, res: Response) => {
 
 
 app.use("/api/auth", authRoutes);
+app.use('/admin', adminRoutes);
 app.use("/api/requests", noDueReqRoutes);
 app.use("/api/users", userRoutes);
 

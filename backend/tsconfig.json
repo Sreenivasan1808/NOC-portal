@@ -44,8 +44,7 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
 
-    "typeRoots": ["./src/types", "./node_modules/@types"]
-  },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "tests"]
+    "typeRoots": ["./src/types", "./node_modules/@types","src" ],
+    
+  }
 }
