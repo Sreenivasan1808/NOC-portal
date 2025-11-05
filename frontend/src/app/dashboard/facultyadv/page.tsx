@@ -1,266 +1,399 @@
 "use client";
-import React from 'react'
+import Navbar from "@/components/navbar";
 import { useState } from "react";
+import {
+  FileText,
+  Users,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  Edit3,
+} from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const FacultyAdvisorDashboard = () => {
   const [activeTab, setActiveTab] = useState("requests");
+  const [selectedRequest, setSelectedRequest] = useState<number | null>(null);
+  const [showApproveDialog, setShowApproveDialog] = useState(false);
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [currentRequestId, setCurrentRequestId] = useState<number | null>(null);
+
+  // Sample data
+  const requests = [
+    {
+      id: 1,
+      name: "John Doe",
+      department: "Computer Science",
+      rollNo: "CS2025001",
+      program: "B.Tech - CSE",
+      date: "2025-09-28",
+      status: "pending",
+      comment: "",
+    },
+    {
+      id: 2,
+      name: "Jane Smith",
+      department: "Electronics",
+      rollNo: "EC2025005",
+      program: "M.Tech - VLSI",
+      date: "2025-09-27",
+      status: "rejected",
+      comment: "Pending dues",
+    },
+  ];
+
+  const students = [
+    {
+      id: 1,
+      name: "John Doe",
+      rollNo: "CS2025001",
+      department: "Computer Science",
+      email: "john.doe@university.edu",
+    },
+    {
+      id: 2,
+      name: "Jane Smith",
+      rollNo: "EC2025005",
+      department: "Electronics",
+      email: "jane.smith@university.edu",
+    },
+  ];
+
+  const handleApproveClick = (requestId: number) => {
+    setCurrentRequestId(requestId);
+    setShowApproveDialog(true);
+  };
+
+  const handleRejectClick = (requestId: number) => {
+    setCurrentRequestId(requestId);
+    setRejectionReason("");
+    setShowRejectDialog(true);
+  };
+
+  const handleApproveConfirm = () => {
+    console.log("Approved request:", currentRequestId);
+    setShowApproveDialog(false);
+    setCurrentRequestId(null);
+  };
+
+  const handleRejectConfirm = () => {
+    console.log("Rejected request:", currentRequestId, "Reason:", rejectionReason);
+    setShowRejectDialog(false);
+    setCurrentRequestId(null);
+    setRejectionReason("");
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "pending":
+        return <Clock className="w-5 h-5 text-amber-500" />;
+      case "approved":
+        return <CheckCircle2 className="w-5 h-5 text-green-500" />;
+      case "rejected":
+        return <XCircle className="w-5 h-5 text-red-500" />;
+      default:
+        return null;
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    return status.charAt(0).toUpperCase() + status.slice(1);
+  };
+
   return (
-    <div className="min-h-screen flex bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md p-6 space-y-6">
-        <h1 className="text-2xl font-bold text-blue-700 mb-8">
-          Faculty Dashboard
-        </h1>
-        <nav className="space-y-4">
-          <button
-            onClick={() => setActiveTab("students")}
-            className={`block w-full text-left px-3 py-2 rounded ${
-              activeTab === "students"
-                ? "bg-blue-600 text-white"
-                : "hover:bg-blue-100 text-gray-700"
-            }`}
-          >
-            👩‍🎓 Students
-          </button>
-          <button
-            onClick={() => setActiveTab("requests")}
-            className={`block w-full text-left px-3 py-2 rounded ${
-              activeTab === "requests"
-                ? "bg-blue-600 text-white"
-                : "hover:bg-blue-100 text-gray-700"
-            }`}
-          >
-            📄 Requests
-          </button>
-        </nav>
-      </aside>
+    <div className="flex flex-col min-h-screen bg-background">
+      <Navbar />
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Top Bar */}
-        <header className="flex justify-end items-center bg-white shadow px-6 py-4">
-          <button className="text-red-600 font-semibold hover:text-red-700">
-            🚪 Logout
-          </button>
-        </header>
-
-        {/* Content Area */}
-        <main className="flex-1 p-8 space-y-6 overflow-y-auto">
-          {activeTab === "students" && (
-            <div>
-              <h2 className="text-2xl font-bold mb-4 text-blue-700">Students</h2>
-              <p className="text-gray-600">
-                List of students will be displayed here.
-              </p>
-            </div>
-          )}
-
-          {activeTab === "requests" && (
-            <div>
-              <h1 className="text-3xl font-bold mb-6 text-blue-700">
+      <div className="flex flex-1">
+        {/* Sidebar */}
+        <aside className="w-64 border-r border-border bg-card shadow-sm">
+          <div className="p-6">
+            <nav className="space-y-2">
+              <button
+                onClick={() => setActiveTab("requests")}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all hover:cursor-pointer hover:bg-secondary ${
+                  activeTab === "requests"
+                    ? "bg-accent text-white shadow-md "
+                    : "text-foreground hover:bg-muted"
+                }`}
+              >
+                <FileText className="w-5 h-5" />
                 Requests
-              </h1>
+              </button>
+              <button
+                onClick={() => setActiveTab("students")}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all hover:cursor-pointer hover:bg-secondary ${
+                  activeTab === "students"
+                    ? "bg-accent text-white shadow-md "
+                    : "text-foreground hover:bg-muted"
+                }`}
+              >
+                <Users className="w-5 h-5" />
+                Students
+              </button>
+            </nav>
+          </div>
+        </aside>
 
-              {/* Example Request Cards */}
+        {/* Main Content */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-8">
+            {activeTab === "requests" && (
               <div className="space-y-6">
-                {/* Pending Request Card */}
-                <div className="bg-white shadow rounded p-6 w-full">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h2 className="text-2xl font-bold text-blue-600">John Doe</h2>
-                      <p className="text-sm text-gray-500 mt-1">Request ID: 1</p>
-                      <p className="text-gray-600 mt-1">
-                        Department: Computer Science
-                      </p>
-                      <p className="text-gray-600">Roll No: CS2025001</p>
-                      <p className="text-gray-600">Program: B.Tech - CSE</p>
-                      <p className="text-gray-500 mt-1">Date: 2025-09-28</p>
-                    </div>
-                    <span className="text-yellow-600 font-semibold flex items-center gap-1 mt-2">
-                      ⏳ Pending
-                    </span>
-                  </div>
-
-                  {/* Approve / Reject / Edit UI */}
-                  <div className="mt-4 space-y-2">
-                    <label className="block font-semibold text-blue-600">
-                      Decision:
-                    </label>
-                    <div className="flex items-center space-x-4">
-                      <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                        ✅ Approve
-                      </button>
-                      <button className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
-                        ❌ Reject
-                      </button>
-                      <button className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
-                        ✏️ Edit
-                      </button>
-                    </div>
-                    <label className="block font-semibold mt-2 text-blue-600">
-                      Comments:
-                    </label>
-                    <textarea
-                      className="w-full border rounded p-2"
-                      placeholder="Enter comments..."
-                      rows={2}
-                    />
-                  </div>
+                <div>
+                  <h2 className="text-3xl font-bold text-foreground">
+                    Student Requests
+                  </h2>
+                  <p className="text-foreground-muted mt-1">
+                    Manage and review student requests
+                  </p>
                 </div>
 
-                {/* Rejected Request Card */}
-                <div className="bg-white shadow rounded p-6 w-full">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h2 className="text-2xl font-bold text-blue-600">
-                        Jane Smith
-                      </h2>
-                      <p className="text-sm text-gray-500 mt-1">Request ID: 2</p>
-                      <p className="text-gray-600 mt-1">
-                        Department: Electronics
-                      </p>
-                      <p className="text-gray-600">Roll No: EC2025005</p>
-                      <p className="text-gray-600">Program: M.Tech - VLSI</p>
-                      <p className="text-gray-500 mt-1">Date: 2025-09-27</p>
-                    </div>
-                    <span className="text-red-600 font-semibold flex items-center gap-1 mt-2">
-                      ❌ Rejected
-                    </span>
-                  </div>
+                <div className="space-y-4">
+                  {requests.map((request) => (
+                    <div
+                      key={request.id}
+                      className="bg-card border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="text-xl font-bold text-foreground">
+                              {request.name}
+                            </h3>
+                            <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-muted">
+                              {getStatusIcon(request.status)}
+                              <span className="text-sm font-medium text-foreground">
+                                {getStatusLabel(request.status)}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4 mt-4">
+                            <div>
+                              <p className="text-xs text-foreground-muted uppercase tracking-wide">
+                                Request ID
+                              </p>
+                              <p className="text-foreground font-medium">
+                                #{request.id}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-foreground-muted uppercase tracking-wide">
+                                Roll Number
+                              </p>
+                              <p className="text-foreground font-medium">
+                                {request.rollNo}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-foreground-muted uppercase tracking-wide">
+                                Department
+                              </p>
+                              <p className="text-foreground font-medium">
+                                {request.department}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-foreground-muted uppercase tracking-wide">
+                                Program
+                              </p>
+                              <p className="text-foreground font-medium">
+                                {request.program}
+                              </p>
+                            </div>
+                          </div>
+                          <p className="text-sm text-foreground-muted mt-3">
+                            Submitted on {request.date}
+                          </p>
+                        </div>
+                      </div>
 
-                  <div className="mt-4 space-y-2">
-                    <label className="block font-semibold text-blue-600">
-                      Decision:
-                    </label>
-                    <div className="flex items-center space-x-4">
-                      <button className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
-                        ✏️ Edit
-                      </button>
+                      {/* Action Buttons - Pending */}
+                      {request.status === "pending" && (
+                        <div className="mt-6 border-t border-border pt-4">
+                          <div className="flex gap-3">
+                            <button 
+                              onClick={() => handleApproveClick(request.id)}
+                              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors hover:cursor-pointer"
+                            >
+                              <CheckCircle2 className="w-4 h-4" />
+                              Approve
+                            </button>
+                            <button 
+                              onClick={() => handleRejectClick(request.id)}
+                              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors hover:cursor-pointer"
+                            >
+                              <XCircle className="w-4 h-4" />
+                              Reject
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Action Buttons - Non-Pending (Approved/Rejected) */}
+                      {request.status !== "pending" && (
+                        <div className="mt-6 space-y-4 border-t border-border pt-4">
+                          <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground hover:opacity-90 rounded-lg font-medium transition-colors">
+                            <Edit3 className="w-4 h-4" />
+                            Edit Request
+                          </button>
+                          {request.status === "rejected" && request.comment && (
+                            <div>
+                              <label className="text-sm font-semibold text-foreground block mb-2">
+                                Rejection Reason
+                              </label>
+                              <textarea
+                                disabled
+                                className="w-full px-3 py-2 border border-border rounded-lg bg-muted text-foreground-muted cursor-not-allowed resize-none"
+                                rows={2}
+                                defaultValue={request.comment}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    <label className="block font-semibold mt-2 text-blue-600">
-                      Comments:
-                    </label>
-                    <textarea
-                      disabled
-                      className="w-full rounded p-2"
-                      placeholder="Reason for rejection: Pending dues"
-                      rows={2}
-                      defaultValue="Pending dues"
-                    />
-                  </div>
+                  ))}
                 </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {activeTab === "students" && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-3xl font-bold text-foreground">
+                    Students
+                  </h2>
+                  <p className="text-foreground-muted mt-1">
+                    View and manage student information
+                  </p>
+                </div>
+
+                <div className="grid gap-4">
+                  {students.map((student) => (
+                    <div
+                      key={student.id}
+                      className="bg-card border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-foreground mb-2">
+                            {student.name}
+                          </h3>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <p className="text-xs text-foreground-muted uppercase tracking-wide">
+                                Roll Number
+                              </p>
+                              <p className="text-foreground font-medium">
+                                {student.rollNo}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-foreground-muted uppercase tracking-wide">
+                                Department
+                              </p>
+                              <p className="text-foreground font-medium">
+                                {student.department}
+                              </p>
+                            </div>
+                            <div className="col-span-2">
+                              <p className="text-xs text-foreground-muted uppercase tracking-wide">
+                                Email
+                              </p>
+                              <p className="text-foreground font-medium">
+                                {student.email}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </main>
       </div>
+
+      {/* Approve Confirmation Dialog */}
+      <AlertDialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Approval</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to approve this request? This action will notify the student.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-background-muted hover:cursor-pointer">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleApproveConfirm}
+              className="bg-primary hover:bg-primary/80 hover:cursor-pointer"
+            >
+              Approve
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Reject Dialog with Reason */}
+      <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject Request</DialogTitle>
+            <DialogDescription>
+              Please provide a reason for rejecting this request. This will be shared with the student.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <label className="text-sm font-semibold text-foreground block mb-2">
+              Rejection Reason
+            </label>
+            <textarea
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+              placeholder="Enter rejection reason..."
+              rows={4}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRejectDialog(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleRejectConfirm}
+              className="bg-red-500 hover:bg-red-600 text-white"
+              disabled={!rejectionReason.trim()}
+            >
+              Reject Request
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
-}
+};
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // <div className="min-h-screen bg-gray-100 p-8 space-y-6 w-full">
-    //   <h1 className="text-3xl font-bold">Faculty Advisor Dashboard</h1>
-
-    //   {/* Example Request Cards */}
-    //   <div className="space-y-6">
-    //     {/* Pending Request Card */}
-    //     <div className="bg-white shadow rounded p-6 w-full">
-    //       <div className="flex justify-between items-start mb-4">
-    //         <div>
-    //           <h2 className="text-2xl font-bold">John Doe</h2>
-    //           <p className="text-sm text-gray-500 mt-1">Request ID: 1</p>
-    //           <p className="text-gray-600 mt-1">Department: Computer Science</p>
-    //           <p className="text-gray-600">Roll No: CS2025001</p>
-    //           <p className="text-gray-600">Program: B.Tech - CSE</p>
-    //           <p className="text-gray-500 mt-1">Date: 2025-09-28</p>
-    //         </div>
-    //         <span className="text-yellow-600 font-semibold flex items-center gap-1 mt-2">
-    //           ⏳ Pending
-    //         </span>
-    //       </div>
-
-    //       {/* Approve / Reject / Edit UI */}
-    //       <div className="mt-4 space-y-2">
-    //         <label className="block font-semibold">Decision:</label>
-    //         <div className="flex items-center space-x-4">
-    //           <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-    //             ✅ Approve
-    //           </button>
-    //           <button className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
-    //             ❌ Reject
-    //           </button>
-    //           <button className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
-    //             ✏️ Edit
-    //           </button>
-    //         </div>
-    //         <label className="block font-semibold mt-2">Comments:</label>
-    //         <textarea
-    //           className="w-full border rounded p-2"
-    //           placeholder="Enter comments..."
-    //           rows={2}
-    //         />
-    //       </div>
-    //     </div>
-
-    //     {/* Rejected Request Card */}
-    //     <div className="bg-white shadow rounded p-6 w-full">
-    //       <div className="flex justify-between items-start mb-4">
-    //         <div>
-    //           <h2 className="text-2xl font-bold">Jane Smith</h2>
-    //           <p className="text-sm text-gray-500 mt-1">Request ID: 2</p>
-    //           <p className="text-gray-600 mt-1">Department: Electronics</p>
-    //           <p className="text-gray-600">Roll No: EC2025005</p>
-    //           <p className="text-gray-600">Program: M.Tech - VLSI</p>
-    //           <p className="text-gray-500 mt-1">Date: 2025-09-27</p>
-    //         </div>
-    //         <span className="text-red-600 font-semibold flex items-center gap-1 mt-2">
-    //           ❌ Rejected
-    //         </span>
-    //       </div>
-
-    //       {/* Approve / Reject / Edit UI */}
-    //       <div className="mt-4 space-y-2">
-    //         <label className="block font-semibold">Decision:</label>
-    //         <div className="flex items-center space-x-4">
-              
-    //           <button className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
-    //             ✏️ Edit
-    //           </button>
-    //         </div>
-    //         <label className="block font-semibold mt-2">Comments:</label>
-    //         <textarea
-    //         disabled
-    //           className="w-full rounded p-2"
-    //           placeholder="Reason for rejection: Pending dues"
-    //           rows={2}
-    //           defaultValue="Pending dues"
-    //         />
-    //       </div>
-    //     </div>
-
-    //     {/* Add more request cards similarly */}
-    //   </div>
-    // </div> 
-
-
-export default FacultyAdvisorDashboard
-
-
+export default FacultyAdvisorDashboard;

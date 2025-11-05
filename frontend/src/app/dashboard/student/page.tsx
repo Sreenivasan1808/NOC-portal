@@ -35,7 +35,7 @@ const StudentDashboard = async () => {
         {/* Place Request Button */}
         <NewRequest />
 
-          <h2 className="text-xl">Your active request</h2>
+          <h2 className="text-2xl font-semibold text-foreground">Your Active Request</h2>
         <div className="rounded-lg bg-background-muted p-4 flex flex-col justify-center items-center w-full">
           <CurrentRequest currentReq={initialRequests} rollNumber={user.rollNumber}/>
         </div>
