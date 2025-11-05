@@ -3,11 +3,14 @@ import authRoutes from "./routes/authRoutes.js"
 import { errorHandler } from './middlewares/errorHandler.js';
 import type { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
+import adminRoutes from './routes/adminRoutes.js';
+
 
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+
 
 // Global error handler (should be after routes)
 app.use(errorHandler);
@@ -20,5 +23,5 @@ app.get('/', (req: Request, res: Response) => {
 
 
 app.use("/api/auth", authRoutes);
-
+app.use('/admin', adminRoutes);
 export default app;
