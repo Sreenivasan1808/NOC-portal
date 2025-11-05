@@ -28,7 +28,7 @@ export const protect = (req: Request, res: Response, next: NextFunction) => {
       role: string;
     };
 
-    req.user = decoded; // ✅ typed correctly now
+    req.user = decoded;
     next();
   } catch (err) {
     return res.status(401).json({ message: "Not authorized, token failed" });
