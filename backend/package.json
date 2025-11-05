@@ -1,40 +1,41 @@
 {
-  "name": "backend",
-  "version": "1.0.0",
-  "description": "",
-  "main": "server.ts",
-  "type": "module",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "dev": "nodemon --watch src --ext ts --exec \"node --loader ts-node/esm src/server.ts\"",
-    "lint": "eslint 'src/**/*.ts'"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@types/bcrypt": "^6.0.0",
-    "@types/express": "^5.0.3",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^24.5.2",
-    "@types/nodemailer": "^7.0.3",
-    "dotenv": "^17.2.2",
-    "eslint": "^9.36.0",
-    "express": "^5.1.0",
-    "mongoose": "^8.18.1",
-    "nodemon": "^3.1.10",
-    "prettier": "^3.6.2",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.9.2"
-  },
-  "dependencies": {
-    "@types/cookie-parser": "^1.4.10",
-    "bcrypt": "^6.0.0",
-    "cookie-parser": "^1.4.7",
-    "crypto": "^1.0.1",
-    "jsonwebtoken": "^9.0.2",
-    "nodemailer": "^7.0.10"
-  }
+    "name": "backend",
+    "version": "1.0.0",
+    "description": "",
+    "main": "server.ts",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "tsc",
+        "start": "node dist/server.js",
+        "dev": "nodemon",
+        "lint": "eslint 'src/**/*.ts'"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/bcrypt": "^6.0.0",
+        "@types/cors": "^2.8.19",
+        "@types/express": "^5.0.3",
+        "@types/jsonwebtoken": "^9.0.10",
+        "@types/node": "^24.5.2",
+        "@types/nodemailer": "^7.0.3",
+        "dotenv": "^17.2.2",
+        "eslint": "^9.36.0",
+        "express": "^5.1.0",
+        "mongoose": "^8.18.1",
+        "nodemon": "^3.1.10",
+        "prettier": "^3.6.2",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.9.2"
+    },
+    "dependencies": {
+        "@types/cookie-parser": "^1.4.10",
+        "bcrypt": "^6.0.0",
+        "cookie-parser": "^1.4.7",
+        "cors": "^2.8.5",
+        "crypto": "^1.0.1",
+        "jsonwebtoken": "^9.0.2",
+        "nodemailer": "^7.0.10"
+    }
 }

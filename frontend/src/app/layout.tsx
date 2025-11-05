@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Roboto } from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/navbar";
 import { Toaster } from "@/components/ui/sonner";
+import QueryProvider from "@/components/query-provider";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -23,9 +23,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${roboto.variable} antialiased`}>
-        {/* <Navbar/> */}
-        {children}
-        <Toaster position="top-center" richColors/>
+        {/* keep server components as-is; mount a small client provider for React Query */}
+        <QueryProvider>
+          {children}
+          <Toaster position="top-center" richColors />
+        </QueryProvider>
       </body>
     </html>
   );
