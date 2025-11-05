@@ -5,6 +5,9 @@ import { getStudentRequests, createNewRequest } from '../controllers/noDueReqCon
 const router = express.Router();
 
 // Get a student's requests segregated into active and previous
+
+router.post('/:reqId/approve', authenticateJWT, approveRequest);
+router.post('/:reqId/reject', authenticateJWT, rejectRequest);
 router.get('/student/:rollNumber', authenticateJWT, getStudentRequests);
 router.post("/", authenticateJWT, createNewRequest);
 
