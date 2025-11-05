@@ -66,11 +66,12 @@ export default function CurrentRequest({
   } = useQuery({
     queryKey: ["currentUser"],
     queryFn: getCurrentUser,
-    // avoid frequent refetches for this client-side user data
     refetchOnWindowFocus: false,
   });
 
-  if (!currentReq.active || !currentReq.active.length) {
+  if (!currentReq.active || currentReq.active.length == 0) {
+    console.log(currentReq);
+    
     return (
       <div className="text-center w-full">
         No requests currently in process.

@@ -4,7 +4,20 @@ import React from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { getSession } from "@/lib/auth";
-import { RefreshCcw } from "lucide-react";
+import { Check, Hourglass, RefreshCcw, X } from "lucide-react";
+import Link from "next/link";
+
+const statusIcons = {
+  Pending: <Hourglass />,
+  Approved: <Check />,
+  Rejected: <X />,
+};
+
+const statusColors = {
+  Pending: "text-secondary",
+  Approved: "text-primary",
+  Rejected: "text-red-500",
+};
 
 export default function PreviousRequests({
   rollNumber,
@@ -32,7 +45,6 @@ export default function PreviousRequests({
     // keep data relatively fresh
     refetchOnWindowFocus: true,
   });
-  
 
   return (
     <div className="w-full">
@@ -43,7 +55,8 @@ export default function PreviousRequests({
             onClick={() => refetch()}
             className="px-3 py-1 rounded bg-background-muted hover:bg-background-muted/80 hover:cursor-pointer flex gap-1"
           >
-            <RefreshCcw />Refresh
+            <RefreshCcw />
+            Refresh
           </button>
           {isFetching && (
             <span className="text-sm text-foreground-muted">Refreshing…</span>
@@ -58,26 +71,37 @@ export default function PreviousRequests({
       ) : (
         <div className="space-y-4">
           {Array.isArray(data.previous) && data.previous.length ? (
-            data.map((req: any) => (
-              <div
-                key={req._id || req.id}
-                className="bg-background-muted p-4 rounded-lg"
-              >
-                <div className="flex justify-between">
-                  <div>
-                    <div className="font-semibold">
-                      Request ID: {req._id || req.id}
+            data.previous.map(
+              (req: { _id: string; createdAt: Date; status: string }) => (
+                <div
+                  key={req._id}
+                  className="bg-background-muted p-4 rounded-lg md:w-96 md:h-72"
+                >
+                  <div className="flex justify-between">
+                    <div>
+                      <div className="font-semibold">Request ID: {req._id}</div>
+                      <div className="text-sm text-foreground-muted">
+                        Requested date:{" "}
+                        {new Date(req.createdAt).toLocaleString()}
+                      </div>
                     </div>
-                    <div className="text-sm text-foreground-muted">
-                      Date: {new Date(req.createdAt).toLocaleString()}
+                    <div className="text-sm font-medium flex flex-col justify-end items-center gap-2">
+                        <Link href={""} className="hover:text-foreground-muted">View details</Link>
+                      <div className="flex items-center">
+                        Status:{" "}
+                        <span
+                          className={`flex gap-1 justify-center items-center ${
+                            statusColors[req.status]
+                          }`}
+                        >
+                          {statusIcons[req.status]} {req.status ?? "Unknown"}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-sm font-medium">
-                    Status: {req.status ?? "Unknown"}
                   </div>
                 </div>
-              </div>
-            ))
+              )
+            )
           ) : (
             <div>No requests found.</div>
           )}
