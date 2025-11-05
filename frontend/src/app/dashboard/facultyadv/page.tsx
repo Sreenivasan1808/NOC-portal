@@ -284,7 +284,7 @@ const FacultyAdvisorDashboard = () => {
                     Students
                   </h2>
                   <p className="text-foreground-muted mt-1">
-                    View and manage student information
+                    View student information
                   </p>
                 </div>
 
