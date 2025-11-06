@@ -1,6 +1,8 @@
 "use client";
 import Navbar from "@/components/navbar";
 import { useState } from "react";
+import axios from "axios";
+import { getSession } from "@/lib/auth";
 import {
   FileText,
   Users,
@@ -89,17 +91,43 @@ const FacultyAdvisorDashboard = () => {
     setShowRejectDialog(true);
   };
 
-  const handleApproveConfirm = () => {
-    console.log("Approved request:", currentRequestId);
-    setShowApproveDialog(false);
-    setCurrentRequestId(null);
+  const handleApproveConfirm = async () => {
+    try {
+      const session = await getSession();
+      const base = (process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL) as string;
+      if (!currentRequestId) return;
+      await axios.post(
+        `${base}/api/requests/${currentRequestId}/approve`,
+        {},
+        { withCredentials: true, headers: { Authorization: `Bearer ${session}` } }
+      );
+      console.log("Approved request:", currentRequestId);
+    } catch (e) {
+      console.error("Approve failed", e);
+    } finally {
+      setShowApproveDialog(false);
+      setCurrentRequestId(null);
+    }
   };
 
-  const handleRejectConfirm = () => {
-    console.log("Rejected request:", currentRequestId, "Reason:", rejectionReason);
-    setShowRejectDialog(false);
-    setCurrentRequestId(null);
-    setRejectionReason("");
+  const handleRejectConfirm = async () => {
+    try {
+      const session = await getSession();
+      const base = (process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL) as string;
+      if (!currentRequestId) return;
+      await axios.post(
+        `${base}/api/requests/${currentRequestId}/reject`,
+        { rejectionReason },
+        { withCredentials: true, headers: { Authorization: `Bearer ${session}` } }
+      );
+      console.log("Rejected request:", currentRequestId, "Reason:", rejectionReason);
+    } catch (e) {
+      console.error("Reject failed", e);
+    } finally {
+      setShowRejectDialog(false);
+      setCurrentRequestId(null);
+      setRejectionReason("");
+    }
   };
 
   const getStatusIcon = (status: string) => {
