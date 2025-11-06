@@ -31,8 +31,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { getSession } from "@/lib/auth";
-import axios from "axios";
+
 
 const FacultyAdvisorDashboard = () => {
   const [activeTab, setActiveTab] = useState("requests");
