@@ -1,6 +1,6 @@
 "use client";
 import Navbar from "@/components/navbar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { getSession } from "@/lib/auth";
 import {
@@ -107,22 +107,34 @@ const FacultyAdvisorDashboard = () => {
     console.error("Failed to load faculty requests:", error);
   }
 
-  const students = [
-    {
-      id: 1,
-      name: "John Doe",
-      rollNo: "CS2025001",
-      department: "Computer Science",
-      email: "john.doe@university.edu",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      rollNo: "EC2025005",
-      department: "Electronics",
-      email: "jane.smith@university.edu",
-    },
-  ];
+  const [students, setStudents] = useState<Array<{ _id?: string; name: string; rollNumber: string; email: string; department: string; program?: string; facultyAdvisorName?: string }>>([]);
+  const [studentsLoading, setStudentsLoading] = useState(false);
+  const [studentsError, setStudentsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (activeTab !== "students") return;
+    let cancelled = false;
+    (async () => {
+      try {
+        setStudentsLoading(true);
+        setStudentsError(null);
+        const session = await getSession();
+        const base = (process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL) as string;
+        const resp = await axios.get(`${base}/api/faculty/students`, {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${session}` },
+        });
+        if (!cancelled) setStudents(resp.data?.items ?? []);
+      } catch (e: any) {
+        if (!cancelled) setStudentsError(e?.response?.data?.message || "Failed to load students");
+      } finally {
+        if (!cancelled) setStudentsLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab]);
 
   const handleApproveClick = (requestId: number) => {
     setCurrentRequestId(requestId);
@@ -375,9 +387,18 @@ const FacultyAdvisorDashboard = () => {
                 </div>
 
                 <div className="grid gap-4">
+                  {studentsLoading && (
+                    <div className="text-sm text-foreground-muted">Loading students…</div>
+                  )}
+                  {studentsError && (
+                    <div className="text-sm text-red-600">{studentsError}</div>
+                  )}
+                  {!studentsLoading && !studentsError && students.length === 0 && (
+                    <div className="text-sm text-foreground-muted">No students found</div>
+                  )}
                   {students.map((student) => (
                     <div
-                      key={student.id}
+                      key={student._id ?? student.rollNumber}
                       className="bg-card border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
                     >
                       <div className="flex items-start justify-between">
@@ -391,7 +412,7 @@ const FacultyAdvisorDashboard = () => {
                                 Roll Number
                               </p>
                               <p className="text-foreground font-medium">
-                                {student.rollNo}
+                                {student.rollNumber}
                               </p>
                             </div>
                             <div>
@@ -402,6 +423,16 @@ const FacultyAdvisorDashboard = () => {
                                 {student.department}
                               </p>
                             </div>
+                            {student.program && (
+                              <div>
+                                <p className="text-xs text-foreground-muted uppercase tracking-wide">
+                                  Program
+                                </p>
+                                <p className="text-foreground font-medium">
+                                  {student.program}
+                                </p>
+                              </div>
+                            )}
                             <div className="col-span-2">
                               <p className="text-xs text-foreground-muted uppercase tracking-wide">
                                 Email
