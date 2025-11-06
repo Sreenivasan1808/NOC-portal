@@ -9,6 +9,7 @@ import adminRoutes from './routes/adminRoutes.js';
 
 import cors from 'cors'
 import userRoutes from './routes/userRoutes';
+import facultyRoutes from './routes/facultyRoutes';
 
 const app = express();
 app.use(express.json());
@@ -37,6 +38,7 @@ app.use("/api/auth", authRoutes);
 app.use('/admin', adminRoutes);
 app.use("/api/requests", noDueReqRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/faculty", facultyRoutes);
 
 app.use(errorHandler);
 
