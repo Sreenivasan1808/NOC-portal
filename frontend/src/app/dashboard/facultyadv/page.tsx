@@ -30,6 +30,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+
 
 const FacultyAdvisorDashboard = () => {
   const [activeTab, setActiveTab] = useState("requests");
@@ -40,28 +42,70 @@ const FacultyAdvisorDashboard = () => {
   const [currentRequestId, setCurrentRequestId] = useState<number | null>(null);
 
   // Sample data
-  const requests = [
-    {
-      id: 1,
-      name: "John Doe",
-      department: "Computer Science",
-      rollNo: "CS2025001",
-      program: "B.Tech - CSE",
-      date: "2025-09-28",
-      status: "pending",
-      comment: "",
+  const {
+    data = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["facultyRequests"],
+    queryFn: async () => {
+      const session = await getSession();
+      if (!session) throw new Error("No session token");
+
+      const base = process.env.NEXT_PUBLIC_SERVER_URL ?? "";
+      const sanitizedBase = base.replace(/\/$/, "");
+
+      // Fetch faculty requests
+      const response = await axios.get(
+        `${sanitizedBase}/api/requests/faculty`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session}`,
+          },
+          withCredentials: true,
+        }
+      );
+
+      const requests = response.data.requests || [];
+
+      // Fetch and attach student data for each request
+      const enrichedRequests = await Promise.all(
+        requests.map(async (req: any) => {
+          try {
+            const studentRes = await axios.get(
+              `${sanitizedBase}/api/users/student/${req.studentRollNumber}`
+            );
+
+            return {
+              ...req,
+              studentData: studentRes.data, // attached here ✅
+            };
+          } catch (err) {
+            console.error(
+              "Student fetch failed for roll:",
+              req.studentRollNumber,
+              err
+            );
+            return req; // fallback if student lookup fails
+          }
+        })
+      );
+
+      return enrichedRequests;
     },
-    {
-      id: 2,
-      name: "Jane Smith",
-      department: "Electronics",
-      rollNo: "EC2025005",
-      program: "M.Tech - VLSI",
-      date: "2025-09-27",
-      status: "rejected",
-      comment: "Pending dues",
-    },
-  ];
+    staleTime: 1000 * 60,
+    retry: 1,
+  });
+
+  // optional: show loading/error in UI (kept minimal here)
+  if (isLoading) {
+    // while loading, show empty array so rest of UI doesn't crash
+    return <div>Loading...</div>;
+  }
+  if (error) {
+    console.error("Failed to load faculty requests:", error);
+  }
 
   const students = [
     {
@@ -132,11 +176,11 @@ const FacultyAdvisorDashboard = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "pending":
+      case "Pending":
         return <Clock className="w-5 h-5 text-amber-500" />;
-      case "approved":
+      case "Approved":
         return <CheckCircle2 className="w-5 h-5 text-green-500" />;
-      case "rejected":
+      case "Rejected":
         return <XCircle className="w-5 h-5 text-red-500" />;
       default:
         return null;
@@ -196,112 +240,126 @@ const FacultyAdvisorDashboard = () => {
                   </p>
                 </div>
 
-                <div className="space-y-4">
-                  {requests.map((request) => (
-                    <div
-                      key={request.id}
-                      className="bg-card border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-xl font-bold text-foreground">
-                              {request.name}
-                            </h3>
-                            <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-muted">
-                              {getStatusIcon(request.status)}
-                              <span className="text-sm font-medium text-foreground">
-                                {getStatusLabel(request.status)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4 mt-4">
-                            <div>
-                              <p className="text-xs text-foreground-muted uppercase tracking-wide">
-                                Request ID
-                              </p>
-                              <p className="text-foreground font-medium">
-                                #{request.id}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-foreground-muted uppercase tracking-wide">
-                                Roll Number
-                              </p>
-                              <p className="text-foreground font-medium">
-                                {request.rollNo}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-foreground-muted uppercase tracking-wide">
-                                Department
-                              </p>
-                              <p className="text-foreground font-medium">
-                                {request.department}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-foreground-muted uppercase tracking-wide">
-                                Program
-                              </p>
-                              <p className="text-foreground font-medium">
-                                {request.program}
-                              </p>
-                            </div>
-                          </div>
-                          <p className="text-sm text-foreground-muted mt-3">
-                            Submitted on {request.date}
-                          </p>
-                        </div>
-                      </div>
+                {data.length > 0 ? (
+                  <div className="space-y-4">
+                    {data.map((request: any) => {
+                      console.log(data);
 
-                      {/* Action Buttons - Pending */}
-                      {request.status === "pending" && (
-                        <div className="mt-6 border-t border-border pt-4">
-                          <div className="flex gap-3">
-                            <button 
-                              onClick={() => handleApproveClick(request.id)}
-                              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors hover:cursor-pointer"
-                            >
-                              <CheckCircle2 className="w-4 h-4" />
-                              Approve
-                            </button>
-                            <button 
-                              onClick={() => handleRejectClick(request.id)}
-                              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors hover:cursor-pointer"
-                            >
-                              <XCircle className="w-4 h-4" />
-                              Reject
-                            </button>
+                      return (
+                        <div
+                          key={request.id}
+                          className="bg-card border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <h3 className="text-xl font-bold text-foreground">
+                                  {request.name}
+                                </h3>
+                                <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-muted">
+                                  {getStatusIcon(request.status)}
+                                  <span className="text-sm font-medium text-foreground">
+                                    {getStatusLabel(request.status)}
+                                  </span>
+                                </div>
+                              </div>
+                                <h2 className="py-4 text-2xl font-semibold leading-none tracking-tight text-foreground">
+                                  {request.studentData.name}
+                                </h2>
+                              <div className="grid grid-cols-2 gap-4 mt-4">
+                                <div>
+                                  <p className="text-xs text-foreground-muted uppercase tracking-wide">
+                                    Request ID
+                                  </p>
+                                  <p className="text-foreground font-medium">
+                                    #{request._id}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-foreground-muted uppercase tracking-wide">
+                                    Roll Number
+                                  </p>
+                                  <p className="text-foreground font-medium">
+                                    {request.studentRollNumber}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-foreground-muted uppercase tracking-wide">
+                                    Department
+                                  </p>
+                                  <p className="text-foreground font-medium">
+                                    {request.studentData.department}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-foreground-muted uppercase tracking-wide">
+                                    Program
+                                  </p>
+                                  <p className="text-foreground font-medium">
+                                    {request.studentData.program}
+                                  </p>
+                                </div>
+                              </div>
+                              <p className="text-sm text-foreground-muted mt-3">
+                                Submitted on {request.createdAt}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      )}
 
-                      {/* Action Buttons - Non-Pending (Approved/Rejected) */}
-                      {request.status !== "pending" && (
-                        <div className="mt-6 space-y-4 border-t border-border pt-4">
-                          <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground hover:opacity-90 rounded-lg font-medium transition-colors">
-                            <Edit3 className="w-4 h-4" />
-                            Edit Request
-                          </button>
-                          {request.status === "rejected" && request.comment && (
-                            <div>
-                              <label className="text-sm font-semibold text-foreground block mb-2">
-                                Rejection Reason
-                              </label>
-                              <textarea
-                                disabled
-                                className="w-full px-3 py-2 border border-border rounded-lg bg-muted text-foreground-muted cursor-not-allowed resize-none"
-                                rows={2}
-                                defaultValue={request.comment}
-                              />
+                          {/* Action Buttons - Pending */}
+                          {request.status === "Pending" && (
+                            <div className="mt-6 border-t border-border pt-4">
+                              <div className="flex gap-3">
+                                <button
+                                  onClick={() => handleApproveClick(request.id)}
+                                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors hover:cursor-pointer"
+                                >
+                                  <CheckCircle2 className="w-4 h-4" />
+                                  Approve
+                                </button>
+                                <button
+                                  onClick={() => handleRejectClick(request.id)}
+                                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors hover:cursor-pointer"
+                                >
+                                  <XCircle className="w-4 h-4" />
+                                  Reject
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Action Buttons - Non-Pending (Approved/Rejected) */}
+                          {request.status !== "Pending" && (
+                            <div className="mt-6 space-y-4 border-t border-border pt-4">
+                              <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground hover:opacity-90 rounded-lg font-medium transition-colors">
+                                <Edit3 className="w-4 h-4" />
+                                Edit Request
+                              </button>
+                              {request.status === "rejected" &&
+                                request.comment && (
+                                  <div>
+                                    <label className="text-sm font-semibold text-foreground block mb-2">
+                                      Rejection Reason
+                                    </label>
+                                    <textarea
+                                      disabled
+                                      className="w-full px-3 py-2 border border-border rounded-lg bg-muted text-foreground-muted cursor-not-allowed resize-none"
+                                      rows={2}
+                                      defaultValue={request.comment}
+                                    />
+                                  </div>
+                                )}
                             </div>
                           )}
                         </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="flex flex-1 items-center justify-center">
+                    <p className="text-foreground-muted">No requests found.</p>
+                  </div>
+                )}
               </div>
             )}
 
@@ -312,7 +370,7 @@ const FacultyAdvisorDashboard = () => {
                     Students
                   </h2>
                   <p className="text-foreground-muted mt-1">
-                    View and manage student information
+                    View student information
                   </p>
                 </div>
 
@@ -370,12 +428,15 @@ const FacultyAdvisorDashboard = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Approval</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to approve this request? This action will notify the student.
+              Are you sure you want to approve this request? This action will
+              notify the student.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-background-muted hover:cursor-pointer">Cancel</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogCancel className="bg-background-muted hover:cursor-pointer">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
               onClick={handleApproveConfirm}
               className="bg-primary hover:bg-primary/80 hover:cursor-pointer"
             >
@@ -391,7 +452,8 @@ const FacultyAdvisorDashboard = () => {
           <DialogHeader>
             <DialogTitle>Reject Request</DialogTitle>
             <DialogDescription>
-              Please provide a reason for rejecting this request. This will be shared with the student.
+              Please provide a reason for rejecting this request. This will be
+              shared with the student.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -407,10 +469,13 @@ const FacultyAdvisorDashboard = () => {
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowRejectDialog(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setShowRejectDialog(false)}
+            >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleRejectConfirm}
               className="bg-red-500 hover:bg-red-600 text-white"
               disabled={!rejectionReason.trim()}

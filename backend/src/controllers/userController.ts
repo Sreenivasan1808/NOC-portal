@@ -7,10 +7,12 @@ export const getStudentData = async (req: Request, res: Response) => {
     try {
         const { rollNumber } = req.params; // Remove the type assertion as it is inferred
 
-        const student = await Student.findOne({ rollNumber });
+        const student = await Student.findOne({ rollNumber }, {passwordHash : 0});
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
+
+        res.status(200).json(student);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

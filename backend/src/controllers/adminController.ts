@@ -1,13 +1,16 @@
 import type { Request, Response } from 'express';
+import type { Express } from 'express'; // Add this line to import Express type
 import csv from 'csv-parser';
 import fs from 'fs';
-import Student from '../models/student.js';
-import FacultyAdvisor from '../models/facultyAdvisor.js';
-import DepartmentRepresentative from '../models/departmentRepresentative.js';
+import type { Multer } from 'multer';
+import Student from '../models/student';
+import FacultyAdvisor from '../models/facultyAdvisor';
+import DepartmentRepresentative from '../models/departmentRepresentative';
+
 
 export const uploadCsv = async (req: Request, res: Response) => {
   const { type } = req.params;
-  const file = req.file;
+  const file = (req as any).file;
 
   if (!file) return res.status(400).json({ message: 'No file uploaded' });
 

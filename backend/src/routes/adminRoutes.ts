@@ -1,8 +1,8 @@
 import express from 'express';
 import multer from 'multer';
-import { uploadCsv } from '../controllers/adminController.js';
-import { authenticateJWT } from '../middlewares/jwtAuth.js';
-import { isAdmin } from '../middlewares/isAdmin.js';
+import { uploadCsv } from '../controllers/adminController';
+import { authenticateJWT } from '../middlewares/jwtAuth';
+import { isAdmin } from '../middlewares/isAdmin';
 
 const router = express.Router();
 const upload = multer({ dest: 'uploads/' });
