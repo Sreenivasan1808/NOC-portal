@@ -4,7 +4,7 @@ import noDueReqRoutes from "./routes/noDueReqRoutes"
 import { errorHandler } from './middlewares/errorHandler';
 import type { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
-import adminRoutes from './routes/adminRoutes.js';
+import adminRoutes from './routes/adminRoutes';
 
 
 import cors from 'cors'

@@ -3,8 +3,12 @@ import FacultyAdvisor from "../models/facultyAdvisor";
 import DepartmentRepresentative from "../models/departmentRepresentative";
 
 import bcrypt from "bcrypt";
-import { AcademicDeptPrograms } from "../constants";
+import { AcademicDeptPrograms, DEPARTMENTS } from "../constants";
 
+const ALL_DEPARTMENTS: string[] = [
+  ...DEPARTMENTS.academic,
+  ...DEPARTMENTS.nonAcademic,
+];
 
 // Sample data with plaintext passwords
 const studentData = [
@@ -169,6 +173,15 @@ const facultyAdvisorData = [
   },
 ];
 
+export const departmentRepresentativeData = ALL_DEPARTMENTS.map(
+  (dept, index) => ({
+    name: `Dept Rep ${dept}`,
+    email: `deptrep_${dept.toLowerCase().replace(/[^a-z0-9]/gi, "_")}@university.edu`,
+    department: dept,
+    password: `dept@${index + 1}#123`, // unique mock password
+  })
+);
+
 export const seedStudents = async () => {
   try {
     await Student.deleteMany({});
@@ -215,5 +228,26 @@ export const seedFacultyAdvisors = async () => {
   }
 };
 
+export const seedDepartmentRepresentatives = async () => {
+  try {
+    await DepartmentRepresentative.deleteMany({});
+    console.log("🧹 Cleared existing department representatives");
+
+    const repsWithHashedPasswords = await Promise.all(
+      departmentRepresentativeData.map(async (rep) => {
+        const hashedPassword = await bcrypt.hash(rep.password, 10);
+        return {
+          ...rep,
+          passwordHash: hashedPassword,
+        };
+      })
+    );
+
+    await DepartmentRepresentative.insertMany(repsWithHashedPasswords);
+    console.log("🎉 Successfully inserted department representative records!");
+  } catch (error) {
+    console.error("❌ Error seeding department representatives:", error);
+  }
+};
 
 
