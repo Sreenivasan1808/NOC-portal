@@ -11,9 +11,14 @@ import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/auth";
 import axios from "axios";
 import { useState } from "react";
-import { useDeptRepRequests } from "../(hooks)/useDeptRepRequests";
+import { useDeptRepRequests } from "../app/dashboard/deptrep/(hooks)/useDeptRepRequests";
+import { INoDueReq } from "@/types/types";
 
-export default function RejectDialog({ request, onClose }: any) {
+export default function RejectDialog({open, onOpenChange, request }: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  request: (INoDueReq & { _id?: string });
+}) {
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
   const { refresh } = useDeptRepRequests();
@@ -28,7 +33,7 @@ export default function RejectDialog({ request, onClose }: any) {
 
       const base = process.env.NEXT_PUBLIC_SERVER_URL ?? "";
       const sanitizedBase = base.replace(/\/$/, "");
-      const reqId = encodeURIComponent(request._id ?? request.id);
+      const reqId = encodeURIComponent(request._id?.toString() ?? "");
 
       await axios.post(
         `${sanitizedBase}/api/requests/${reqId}/reject`,
@@ -41,7 +46,7 @@ export default function RejectDialog({ request, onClose }: any) {
 
       refresh();
       setReason("");
-      onClose();
+      onOpenChange(false);
     } catch (error) {
       console.error("Reject failed:", error);
     } finally {
@@ -50,7 +55,7 @@ export default function RejectDialog({ request, onClose }: any) {
   };
 
   return (
-    <Dialog open={!!request} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Reject Request</DialogTitle>
@@ -74,11 +79,11 @@ export default function RejectDialog({ request, onClose }: any) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={loading}>
+          <Button variant="outline" onClick={() =>onOpenChange(false)} disabled={loading} className="hover:cursor-pointer">
             Cancel
           </Button>
           <Button
-            className="bg-red-500 hover:bg-red-600 text-white"
+            className="bg-red-500 hover:bg-red-600 text-white hover:cursor-pointer"
             onClick={handleReject}
             disabled={!reason.trim() || loading}
           >

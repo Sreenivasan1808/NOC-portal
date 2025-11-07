@@ -329,7 +329,10 @@ export const getRequestsFaculty = async (req: Request, res: Response) => {
 };
 
 export const getRequestsDeptRep = async (req: Request, res: Response) => {
+    console.log("FUnction entered");
     try {
+        console.log("FUnction entered");
+        
         const user: any = (req as any).user;
         if (!user?.role || !user?.id)
             return res.status(401).json({ message: 'Unauthorized' });
@@ -342,14 +345,24 @@ export const getRequestsDeptRep = async (req: Request, res: Response) => {
                 });
         }
 
-        const requests = await NoDueReq.find({
+        const pending_requests = await NoDueReq.find({
             departmentApprovals: {
                 $elemMatch: { approverId: user.id, status: "Pending" },
             },
         })
             .sort({ createdAt: -1 })
             .lean();
-        return res.status(200).json({ requests });
+        const completed_requests = await NoDueReq.find({
+            departmentApprovals: {
+                $elemMatch: { approverId: user.id, status: { $ne: "Pending" } },
+            },
+        })
+            .sort({ createdAt: -1 })
+            .lean();
+
+            console.log({ pending_requests, completed_requests });
+            
+        return res.status(200).json({ pending_requests, completed_requests });
     } catch (err) {
         return res.status(500).json({ message: 'Failed to fetch requests' });
     }
