@@ -32,7 +32,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 
-
 const FacultyAdvisorDashboard = () => {
   const [activeTab, setActiveTab] = useState("requests");
   const [selectedRequest, setSelectedRequest] = useState<number | null>(null);
@@ -40,12 +39,55 @@ const FacultyAdvisorDashboard = () => {
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [currentRequestId, setCurrentRequestId] = useState<number | null>(null);
+  const [students, setStudents] = useState<
+    Array<{
+      _id?: string;
+      name: string;
+      rollNumber: string;
+      email: string;
+      department: string;
+      program?: string;
+      facultyAdvisorName?: string;
+    }>
+  >([]);
+  const [studentsLoading, setStudentsLoading] = useState(false);
+  const [studentsError, setStudentsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (activeTab !== "students") return;
+    let cancelled = false;
+    (async () => {
+      try {
+        setStudentsLoading(true);
+        setStudentsError(null);
+        const session = await getSession();
+        const base = (process.env.NEXT_PUBLIC_SERVER_URL ||
+          process.env.SERVER_URL) as string;
+        const resp = await axios.get(`${base}/api/faculty/students`, {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${session}` },
+        });
+        if (!cancelled) setStudents(resp.data?.items ?? []);
+      } catch (e: any) {
+        if (!cancelled)
+          setStudentsError(
+            e?.response?.data?.message || "Failed to load students"
+          );
+      } finally {
+        if (!cancelled) setStudentsLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab]);
 
   // Sample data
   const {
     data = [],
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["facultyRequests"],
     queryFn: async () => {
@@ -107,42 +149,13 @@ const FacultyAdvisorDashboard = () => {
     console.error("Failed to load faculty requests:", error);
   }
 
-  const [students, setStudents] = useState<Array<{ _id?: string; name: string; rollNumber: string; email: string; department: string; program?: string; facultyAdvisorName?: string }>>([]);
-  const [studentsLoading, setStudentsLoading] = useState(false);
-  const [studentsError, setStudentsError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (activeTab !== "students") return;
-    let cancelled = false;
-    (async () => {
-      try {
-        setStudentsLoading(true);
-        setStudentsError(null);
-        const session = await getSession();
-        const base = (process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL) as string;
-        const resp = await axios.get(`${base}/api/faculty/students`, {
-          withCredentials: true,
-          headers: { Authorization: `Bearer ${session}` },
-        });
-        if (!cancelled) setStudents(resp.data?.items ?? []);
-      } catch (e: any) {
-        if (!cancelled) setStudentsError(e?.response?.data?.message || "Failed to load students");
-      } finally {
-        if (!cancelled) setStudentsLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [activeTab]);
-
   const handleApproveClick = (requestId: number) => {
-    setCurrentRequestId(requestId);
+    setCurrentRequestId(prev => requestId);
     setShowApproveDialog(true);
   };
 
   const handleRejectClick = (requestId: number) => {
-    setCurrentRequestId(requestId);
+    setCurrentRequestId(prev => requestId);
     setRejectionReason("");
     setShowRejectDialog(true);
   };
@@ -150,12 +163,20 @@ const FacultyAdvisorDashboard = () => {
   const handleApproveConfirm = async () => {
     try {
       const session = await getSession();
-      const base = (process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL) as string;
+      const base = (process.env.NEXT_PUBLIC_SERVER_URL ||
+        process.env.SERVER_URL) as string;
+      console.log(base);
+      console.log(currentRequestId);
+      
+      
       if (!currentRequestId) return;
       await axios.post(
         `${base}/api/requests/${currentRequestId}/approve`,
         {},
-        { withCredentials: true, headers: { Authorization: `Bearer ${session}` } }
+        {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${session}` },
+        }
       );
       console.log("Approved request:", currentRequestId);
     } catch (e) {
@@ -163,26 +184,37 @@ const FacultyAdvisorDashboard = () => {
     } finally {
       setShowApproveDialog(false);
       setCurrentRequestId(null);
+      refetch();
     }
   };
 
   const handleRejectConfirm = async () => {
     try {
       const session = await getSession();
-      const base = (process.env.NEXT_PUBLIC_SERVER_URL || process.env.SERVER_URL) as string;
+      const base = (process.env.NEXT_PUBLIC_SERVER_URL ||
+        process.env.SERVER_URL) as string;
       if (!currentRequestId) return;
       await axios.post(
         `${base}/api/requests/${currentRequestId}/reject`,
         { rejectionReason },
-        { withCredentials: true, headers: { Authorization: `Bearer ${session}` } }
+        {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${session}` },
+        }
       );
-      console.log("Rejected request:", currentRequestId, "Reason:", rejectionReason);
+      console.log(
+        "Rejected request:",
+        currentRequestId,
+        "Reason:",
+        rejectionReason
+      );
     } catch (e) {
       console.error("Reject failed", e);
     } finally {
       setShowRejectDialog(false);
       setCurrentRequestId(null);
       setRejectionReason("");
+      refetch();
     }
   };
 
@@ -275,9 +307,9 @@ const FacultyAdvisorDashboard = () => {
                                   </span>
                                 </div>
                               </div>
-                                <h2 className="py-4 text-2xl font-semibold leading-none tracking-tight text-foreground">
-                                  {request.studentData.name}
-                                </h2>
+                              <h2 className="py-4 text-2xl font-semibold leading-none tracking-tight text-foreground">
+                                {request.studentData.name}
+                              </h2>
                               <div className="grid grid-cols-2 gap-4 mt-4">
                                 <div>
                                   <p className="text-xs text-foreground-muted uppercase tracking-wide">
@@ -323,14 +355,14 @@ const FacultyAdvisorDashboard = () => {
                             <div className="mt-6 border-t border-border pt-4">
                               <div className="flex gap-3">
                                 <button
-                                  onClick={() => handleApproveClick(request.id)}
+                                  onClick={() => handleApproveClick(request._id)}
                                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors hover:cursor-pointer"
                                 >
                                   <CheckCircle2 className="w-4 h-4" />
                                   Approve
                                 </button>
                                 <button
-                                  onClick={() => handleRejectClick(request.id)}
+                                  onClick={() => handleRejectClick(request._id)}
                                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors hover:cursor-pointer"
                                 >
                                   <XCircle className="w-4 h-4" />
@@ -388,14 +420,20 @@ const FacultyAdvisorDashboard = () => {
 
                 <div className="grid gap-4">
                   {studentsLoading && (
-                    <div className="text-sm text-foreground-muted">Loading students…</div>
+                    <div className="text-sm text-foreground-muted">
+                      Loading students…
+                    </div>
                   )}
                   {studentsError && (
                     <div className="text-sm text-red-600">{studentsError}</div>
                   )}
-                  {!studentsLoading && !studentsError && students.length === 0 && (
-                    <div className="text-sm text-foreground-muted">No students found</div>
-                  )}
+                  {!studentsLoading &&
+                    !studentsError &&
+                    students.length === 0 && (
+                      <div className="text-sm text-foreground-muted">
+                        No students found
+                      </div>
+                    )}
                   {students.map((student) => (
                     <div
                       key={student._id ?? student.rollNumber}

@@ -9,9 +9,9 @@ import { seedStudents, seedFacultyAdvisors, seedDepartmentRepresentatives } from
 const startServer = async () => {
   try {
     await connectDB();
-    await seedStudents();
-    await seedFacultyAdvisors();
-    await seedDepartmentRepresentatives();
+    // await seedStudents();
+    // await seedFacultyAdvisors();
+    // await seedDepartmentRepresentatives();
 
     app.listen(config.port, () => {
       console.log(`🚀 Server running on port ${config.port}`);

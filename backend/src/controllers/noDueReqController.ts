@@ -4,8 +4,9 @@ import Student from '../models/student';
 import FacultyAdvisor, { IFacultyAdvisor } from '../models/facultyAdvisor';
 import DepartmentRepresentative from '../models/departmentRepresentative';
 import sendEmail from '../utils/sendEmail';
+import {DEPARTMENTS} from '../constants'
 
-const ACTIVE_STATUSES = new Set(['Pending', 'In Review', 'Partially Approved']);
+const ACTIVE_STATUSES = new Set(['Pending', 'FA Approved']);
 
 export async function getStudentRequests(req: Request, res: Response) {
     try {
@@ -61,6 +62,7 @@ export const createNewRequest = async (req: Request, res: Response) => {
                 message:
                     "Can't create a new request while an existing one is still in progress.",
             });
+            return;
         }
         const FA = await FacultyAdvisor.findOne<IFacultyAdvisor>({
             name: user?.facultyAdvisorName,
@@ -140,7 +142,7 @@ export async function approveRequest(req: Request, res: Response) {
                     .status(404)
                     .json({ message: 'Student for this request not found' });
             const deptReps = await DepartmentRepresentative.find({
-                department: { $in: [student.department, ...student.academicDepts] },
+                department: { $in: [student.department, ...DEPARTMENTS.nonAcademic] },
             }).lean();
             doc.departmentApprovals = deptReps.map((rep) => ({
                 department: rep.department,
@@ -200,21 +202,23 @@ export async function approveRequest(req: Request, res: Response) {
             doc.facultyAdvisorApproval?.status === 'Approved' &&
             allDeptApproved
         ) {
-            doc.status = 'Approved';
+            doc.status = 'Fully Approved';
         } else if (
             doc.facultyAdvisorApproval?.status === 'Approved' ||
             (doc.departmentApprovals || []).some(
                 (a: any) => a.status === 'Approved',
             )
         ) {
-            doc.status = 'Partially Approved';
+            doc.status = 'FA Approved';
         } else {
-            doc.status = 'In Review';
+            doc.status = 'Pending';
         }
 
         await doc.save();
         return res.json({ message: 'Approved successfully', request: doc });
     } catch (err) {
+        console.log(err);
+        
         return res.status(500).json({ message: 'Failed to approve request' });
     }
 }
@@ -340,7 +344,7 @@ export const getRequestsDeptRep = async (req: Request, res: Response) => {
 
         const requests = await NoDueReq.find({
             departmentApprovals: {
-                $elemMatch: { approverId: user.id },
+                $elemMatch: { approverId: user.id, status: "Pending" },
             },
         })
             .sort({ createdAt: -1 })

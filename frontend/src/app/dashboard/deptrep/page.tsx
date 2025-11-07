@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getSession } from "@/lib/auth";
+import { getCurrentUser, getSession } from "@/lib/auth";
 import axios from "axios";
 
 const DepartmentRepresentativeDashboard = () => {
@@ -43,6 +43,7 @@ const DepartmentRepresentativeDashboard = () => {
   const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
 
   const queryClient = useQueryClient();
+
 
   const {
     data = [],
@@ -291,10 +292,21 @@ const DepartmentRepresentativeDashboard = () => {
 
                 {Array.isArray(data) && data.length > 0 ? (
                   <div className="space-y-4">
-                    {data.map((request: any) => {
+                    {data.map(async (request: any) => {
                       // Support both _id and id fields
                       const reqId = request._id ?? request.id;
                       const status = request.status ?? request.state ?? "Pending";
+                      const me = await getCurrentUser();
+                      const myDepartment = me.department;
+                      // Find my department’s approval object
+                      const myDeptApproval = request.departmentApprovals.find(
+                        dept => dept.department === myDepartment
+                      );
+
+                      const faApproved = String(request.status).toLowerCase() === "fa approved";
+                      const isPending = myDeptApproval?.status?.toLowerCase() === "pending";
+
+
 
                       console.log("Rendering request", reqId, request);
 
@@ -361,7 +373,7 @@ const DepartmentRepresentativeDashboard = () => {
                           </div>
 
                           {/* Action Buttons - Pending */}
-                          {String(status).toLowerCase() === "pending" && (
+                          {faApproved && isPending && (
                             <div className="mt-6 border-t border-border pt-4">
                               <div className="flex gap-3">
                                 <button
@@ -383,14 +395,15 @@ const DepartmentRepresentativeDashboard = () => {
                           )}
 
                           {/* Action Buttons - Non-Pending (Approved/Rejected) */}
-                          {String(status).toLowerCase() !== "pending" && (
+                          {
+                          String(status).toLowerCase() !== "fully approved" && (
                             <div className="mt-6 space-y-4 border-t border-border pt-4">
                               <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground hover:opacity-90 rounded-lg font-medium transition-colors">
                                 <Edit3 className="w-4 h-4" />
                                 Edit Request
                               </button>
 
-                              {String(status).toLowerCase() === "rejected" &&
+                              {myDeptApproval?.status?.toLowerCase() === "rejected" &&
                                 request.comment && (
                                   <div>
                                     <label className="text-sm font-semibold text-foreground block mb-2">

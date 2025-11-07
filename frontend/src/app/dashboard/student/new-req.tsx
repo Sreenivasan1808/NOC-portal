@@ -13,8 +13,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
 const NewRequest = () => {
+  const router = useRouter();
   const handleNewReq = async () => {
     try {
       const token = await getSession();
@@ -56,15 +58,18 @@ const NewRequest = () => {
                 Cancel
               </button>
             </DialogClose>
-            <button
-              className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 hover:cursor-pointer"
-              onClick={async () => {
-                // call the same handler and close the dialog (Dialog will close automatically if using DialogClose or onOpenChange)
-                await handleNewReq();
-              }}
-            >
-              Confirm
-            </button>
+            <DialogClose asChild>
+              <button
+                className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 hover:cursor-pointer"
+                onClick={async () => {
+                  // call the same handler and close the dialog (Dialog will close automatically if using DialogClose or onOpenChange)
+                  await handleNewReq();
+                  router.refresh();
+                }}
+              >
+                Confirm
+              </button>
+            </DialogClose>
           </div>
         </DialogContent>
       </Dialog>

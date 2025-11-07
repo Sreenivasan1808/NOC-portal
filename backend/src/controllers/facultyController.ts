@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
-import Student from '../models/student.js';
-import FacultyAdvisor from '../models/facultyAdvisor.js';
+import Student from '../models/student';
+import FacultyAdvisor from '../models/facultyAdvisor';
 
 // Helper: resolve advisor by id (param) or from JWT (req.user)
 async function resolveAdvisor(req: Request): Promise<{ id: string; name?: string } | null> {

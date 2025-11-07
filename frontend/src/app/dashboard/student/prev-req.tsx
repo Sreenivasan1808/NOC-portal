@@ -11,7 +11,12 @@ const statusConfig = {
     badge: "bg-amber-500/15 text-amber-700 dark:text-amber-400",
     dot: "bg-amber-500",
   },
-  Approved: {
+  "FA Approved": {
+    icon: <Check className="w-4 h-4" />,
+    badge: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
+    dot: "bg-amber-600",
+  },
+  "Fully Approved": {
     icon: <Check className="w-4 h-4" />,
     badge: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
     dot: "bg-emerald-500",
