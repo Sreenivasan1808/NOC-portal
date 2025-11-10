@@ -1,4 +1,4 @@
-interface IFacultyAdvisorApproval {
+export interface IFacultyAdvisorApproval {
     approverId: string;
     status: 'Pending' | 'Approved' | 'Rejected';
     dueDate?: Date;
@@ -6,7 +6,8 @@ interface IFacultyAdvisorApproval {
     date?: Date;
 }
 
-interface IDepartmentApproval {
+export interface IDepartmentApproval {
+    _id:string;
     department: string;
     approverId: string;
     status: 'Pending' | 'Approved' | 'Rejected';

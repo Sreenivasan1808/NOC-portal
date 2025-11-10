@@ -1,10 +1,13 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { CheckCircle2, XCircle, Clock } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, Edit2 } from "lucide-react";
 import ApproveDialog from "@/components/ApproveDialog";
 import RejectDialog from "@/components/RejectDialog";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, getSession } from "@/lib/auth";
 import { IDeptRep, IFacultyAdvisor, INoDueReq, IStudent } from "@/types/types";
+import { useDeptRepRequests } from "../(hooks)/useDeptRepRequests";
+import { toast } from "sonner";
+import axios from "axios";
 
 export default function RequestCard({
   request,
@@ -14,15 +17,11 @@ export default function RequestCard({
     _id: string;
   };
 }) {
-  // const queryClient = useQueryClient();
-
-  // UI state
-  // const [rejectReason, setRejectReason] = useState<string>("");
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [currentUser, setCurrentUser] = useState<
     IStudent | IFacultyAdvisor | IDeptRep | null
   >(null);
-  // const [loadingReject, setLoadingReject] = useState(false);
+  const { refresh } = useDeptRepRequests();
 
   const [showApproveDialog, setShowApproveDialog] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
@@ -30,6 +29,7 @@ export default function RequestCard({
   // load current user (to read user.department)
   useEffect(() => {
     let mounted = true;
+
     (async () => {
       try {
         const user = await getCurrentUser(); // expected to return { department, ... }
@@ -43,6 +43,27 @@ export default function RequestCard({
       mounted = false;
     };
   }, []);
+
+  const handleReopenClick = async () => {
+    try {
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/requests/reopen/${request._id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${await getSession()}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        toast.success("Request reopened successfully");
+        refresh();
+      }
+    } catch (error) {
+      toast.error("Failed to reopen request");
+      console.log(error);
+    }
+  };
 
   // helpers
   const formatDate = (d: Date) => {
@@ -81,6 +102,10 @@ export default function RequestCard({
   const showActions =
     String(request?.status ?? "").toLowerCase() === "fa approved" &&
     deptObj?.status === "Pending";
+
+  const showEditButton =
+    (String(request?.status ?? "").toLowerCase() === "fa approved" ||String(request?.status ?? "").toLowerCase() === "rejected") &&
+    deptObj?.status !== "Pending";
 
   return (
     <div className="bg-card border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
@@ -133,6 +158,17 @@ export default function RequestCard({
                 {request.studentData?.program ?? "—"}
               </p>
             </div>
+
+            {deptObj?.status === "Rejected" && (
+              <div>
+                <p className="text-xs text-foreground-muted uppercase tracking-wide">
+                  Rejection reason
+                </p>
+                <p className="text-foreground font-medium">
+                  {deptObj?.rejectionReason ?? "-"}
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="mt-4">
@@ -159,7 +195,7 @@ export default function RequestCard({
               }}
             >
               <CheckCircle2 className="w-4 h-4" />
-              {loadingApprove ? "Approving..." : "Approve"}
+              {showApproveDialog ? "Approving..." : "Approve"}
             </button>
 
             <button
@@ -174,6 +210,22 @@ export default function RequestCard({
           </div>
         </div>
       )}
+
+      {showEditButton && (
+        <div className="mt-4 space-y-3">
+          <div className="flex gap-3">
+            <button
+              disabled={loadingApprove}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-accent/80 hover:bg-accent/70 text-white rounded-lg font-medium transition-colors hover:cursor-pointer"
+              onClick={handleReopenClick}
+            >
+              <Edit2 className="w-4 h-4" />
+              Reopen request
+            </button>
+          </div>
+        </div>
+      )}
+
       <ApproveDialog
         open={showApproveDialog}
         onOpenChange={setShowApproveDialog}

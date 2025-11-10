@@ -14,10 +14,14 @@ import { useState } from "react";
 import { useDeptRepRequests } from "../app/dashboard/deptrep/(hooks)/useDeptRepRequests";
 import { INoDueReq } from "@/types/types";
 
-export default function RejectDialog({open, onOpenChange, request }: {
+export default function RejectDialog({
+  open,
+  onOpenChange,
+  request,
+}: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  request: (INoDueReq & { _id?: string });
+  request: INoDueReq & { _id?: string };
 }) {
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
@@ -37,7 +41,7 @@ export default function RejectDialog({open, onOpenChange, request }: {
 
       await axios.post(
         `${sanitizedBase}/api/requests/${reqId}/reject`,
-        { comment: reason },
+        { rejectionReason: reason },
         {
           headers: { Authorization: `Bearer ${session}` },
           withCredentials: true,
@@ -65,9 +69,7 @@ export default function RejectDialog({open, onOpenChange, request }: {
         </DialogHeader>
 
         <div className="py-4">
-          <label className="text-sm font-medium block mb-2">
-            Reason
-          </label>
+          <label className="text-sm font-medium block mb-2">Reason</label>
           <textarea
             className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-destructive resize-none"
             rows={4}
@@ -79,7 +81,12 @@ export default function RejectDialog({open, onOpenChange, request }: {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() =>onOpenChange(false)} disabled={loading} className="hover:cursor-pointer">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+            className="hover:cursor-pointer"
+          >
             Cancel
           </Button>
           <Button

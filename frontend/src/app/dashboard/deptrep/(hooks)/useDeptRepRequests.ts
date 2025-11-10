@@ -35,10 +35,15 @@ export const useDeptRepRequests = () => {
         );
       };
 
-      return {
+      const returnData = {
         pending_requests: await enrichWithStudentData(data.pending_requests),
         completed_requests: await enrichWithStudentData(data.completed_requests),
       };
+
+      console.log(returnData);
+      
+
+      return returnData;
     },
     staleTime: 60_000,
     retry: 1,

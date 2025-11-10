@@ -4,7 +4,7 @@ import Student from '../models/student';
 import FacultyAdvisor, { IFacultyAdvisor } from '../models/facultyAdvisor';
 import DepartmentRepresentative from '../models/departmentRepresentative';
 import sendEmail from '../utils/sendEmail';
-import {DEPARTMENTS} from '../constants'
+import { DEPARTMENTS } from '../constants';
 
 const ACTIVE_STATUSES = new Set(['Pending', 'FA Approved']);
 
@@ -142,14 +142,15 @@ export async function approveRequest(req: Request, res: Response) {
                     .status(404)
                     .json({ message: 'Student for this request not found' });
             const deptReps = await DepartmentRepresentative.find({
-                department: { $in: [student.department, ...DEPARTMENTS.nonAcademic] },
+                department: {
+                    $in: [student.department, ...DEPARTMENTS.nonAcademic],
+                },
             }).lean();
             doc.departmentApprovals = deptReps.map((rep) => ({
                 department: rep.department,
                 approverId: rep._id,
                 status: 'Pending',
             }));
-            
         } else if (user.role === 'deptrep') {
             // Find matching department approval by approverId or department
             let idx = -1;
@@ -218,7 +219,7 @@ export async function approveRequest(req: Request, res: Response) {
         return res.json({ message: 'Approved successfully', request: doc });
     } catch (err) {
         console.log(err);
-        
+
         return res.status(500).json({ message: 'Failed to approve request' });
     }
 }
@@ -329,41 +330,115 @@ export const getRequestsFaculty = async (req: Request, res: Response) => {
 };
 
 export const getRequestsDeptRep = async (req: Request, res: Response) => {
-    console.log("FUnction entered");
+    console.log("endpoint reached");
+    
     try {
-        console.log("FUnction entered");
-        
         const user: any = (req as any).user;
         if (!user?.role || !user?.id)
             return res.status(401).json({ message: 'Unauthorized' });
 
         if (user.role !== 'deptrep') {
-            return res
-                .status(403)
-                .json({
-                    message: 'Only department representatives can access this',
-                });
+            return res.status(403).json({
+                message: 'Only department representatives can access this',
+            });
         }
 
         const pending_requests = await NoDueReq.find({
             departmentApprovals: {
-                $elemMatch: { approverId: user.id, status: "Pending" },
+                $elemMatch: { approverId: user.id, status: 'Pending' },
             },
         })
             .sort({ createdAt: -1 })
             .lean();
         const completed_requests = await NoDueReq.find({
             departmentApprovals: {
-                $elemMatch: { approverId: user.id, status: { $ne: "Pending" } },
+                $elemMatch: { approverId: user.id, status: { $ne: 'Pending' } },
             },
         })
             .sort({ createdAt: -1 })
             .lean();
 
-            console.log({ pending_requests, completed_requests });
-            
+        console.log({ pending_requests, completed_requests });
+
         return res.status(200).json({ pending_requests, completed_requests });
     } catch (err) {
+        console.log(err);
+        
         return res.status(500).json({ message: 'Failed to fetch requests' });
+    }
+};
+
+export const reopenRequest = async (req: Request, res: Response) => {
+    try {
+        const { reqid } = req.params as { reqid?: string };
+        console.log(reqid);
+
+        if (!reqid) {
+            return res.status(400).json({ message: 'Reqid is required' });
+        }
+
+        const user = (req as any).user;
+        if (!user?.role || !user?.id)
+            return res.status(401).json({ message: 'Unauthorized' });
+
+        const reqDoc = await NoDueReq.findById(reqid);
+        if (!reqDoc) {
+            return res.status(400).json({ message: 'Request not found' });
+        }
+
+        if (user.role == 'facultyadv') {
+            reqDoc.status = 'Pending';
+            reqDoc.facultyAdvisorApproval.status = 'Pending';
+            reqDoc.save();
+        } else if (user.role == 'deptrep') {
+            reqDoc.status = 'FA Approved';
+            if (Array.isArray(reqDoc.departmentApprovals)) {
+                for (const approval of reqDoc.departmentApprovals) {
+                    if (String(approval.approverId) === String(user.id)) {
+                        approval.status = 'Pending';
+                    }
+                }
+                reqDoc.save();
+            }
+        } else {
+            return res.status(403).json({
+                message: 'Only faculty advisors or department reps can reopen',
+            });
+        }
+
+        res.status(200).json({ message: 'Request reopened successfully' });
+    } catch (error) {
+        return res
+            .status(500)
+            .json({
+                message: 'Internal server error. Failed to reopen request',
+            });
+    }
+};
+
+export const getRequestById = async (req: Request, res: Response) => {
+    try {
+        const { reqid } = req.params as { reqid?: string };
+
+        console.log(reqid);
+
+        if (!reqid) {
+            return res.status(400).json({ message: 'Reqid is required' });
+        }
+
+        const user = (req as any).user;
+        if (!user?.role || !user?.id)
+            return res.status(401).json({ message: 'Unauthorized' });
+
+        const reqDoc = await NoDueReq.findById(reqid).lean();
+        
+        if(!reqDoc){
+            return res.status(404).json({message:"Request not found"});
+        }
+
+        res.status(200).json({request: reqDoc});
+
+    } catch (error) {
+        return res.status(500).json({message: 'Internal server error. Failed to fetch request' });
     }
 };

@@ -130,7 +130,7 @@ export default function PreviousRequests({
 
                 {/* View details link */}
                 <Link
-                  href={""}
+                  href={"/dashboard/student/requests/" + encodeURIComponent(req._id)}
                   className="flex items-center gap-1 text-foreground hover:text-accent transition-colors flex-shrink-0"
                 >
                   <span className="text-sm font-medium">Details</span>
