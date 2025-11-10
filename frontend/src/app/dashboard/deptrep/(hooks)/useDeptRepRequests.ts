@@ -12,7 +12,7 @@ export const useDeptRepRequests = () => {
     queryKey: ["deptRepRequests"],
     queryFn: async () => {
       const session = await getSession();
-      if (!session) throw new Error("No session token");
+      if (!session) throw new Error("No session token");      
 
       const base = process.env.NEXT_PUBLIC_SERVER_URL ?? "";
       const sanitizedBase = base.replace(/\/$/, "");
@@ -21,6 +21,10 @@ export const useDeptRepRequests = () => {
         `${sanitizedBase}/api/requests/deptrep`,
         { headers: { Authorization: `Bearer ${session}` } }
       );
+
+      console.log(data);
+      console.log("Data retrieved");
+      
 
       const enrichWithStudentData = async (requests: (INoDueReq & {_id: string})[]) => {
         return Promise.all(
@@ -35,6 +39,9 @@ export const useDeptRepRequests = () => {
         );
       };
 
+
+      console.log("student data");
+      
       const returnData = {
         pending_requests: await enrichWithStudentData(data.pending_requests),
         completed_requests: await enrichWithStudentData(data.completed_requests),

@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import { authenticateJWT } from '../middlewares/jwtAuth';
 import {
     getStudentRequests,
@@ -18,10 +18,10 @@ const router = express.Router();
 router.post('/:reqId/approve', authenticateJWT, approveRequest);
 router.post('/:reqId/reject', authenticateJWT, rejectRequest);
 router.get('/student/:rollNumber', authenticateJWT, getStudentRequests);
-router.get('/:reqid', authenticateJWT, getRequestById);
 router.get('/faculty', authenticateJWT, getRequestsFaculty);
 router.get('/deptrep', authenticateJWT, getRequestsDeptRep);
 router.put('/reopen/:reqid', authenticateJWT, reopenRequest);
+router.get('/:reqid', authenticateJWT, getRequestById);
 router.post('/', authenticateJWT, createNewRequest);
 
 export default router;

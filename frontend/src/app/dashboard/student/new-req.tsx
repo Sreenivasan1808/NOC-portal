@@ -31,7 +31,8 @@ const NewRequest = () => {
       );
       console.log(response.data);
       toast.success(response.data.message);
-    } catch (error) {
+    } catch (error: unknown) {
+      //@ts-expect-error - Axios error response type is not properly typed for unknown error
       toast.error(error.response.data.message);
       console.log(error);
     }

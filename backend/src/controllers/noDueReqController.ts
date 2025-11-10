@@ -5,6 +5,7 @@ import FacultyAdvisor, { IFacultyAdvisor } from '../models/facultyAdvisor';
 import DepartmentRepresentative from '../models/departmentRepresentative';
 import sendEmail from '../utils/sendEmail';
 import { DEPARTMENTS } from '../constants';
+import mongoose from '../mongooseClient';
 
 const ACTIVE_STATUSES = new Set(['Pending', 'FA Approved']);
 
@@ -55,7 +56,7 @@ export const createNewRequest = async (req: Request, res: Response) => {
 
         const existingRequests = await NoDueReq.find({
             studentRollNumber: user.rollNumber,
-            status: 'Pending',
+            status: { $in: ['Pending', 'FA Approved'] },
         });
         if (existingRequests.length > 0) {
             res.status(400).json({
@@ -306,66 +307,124 @@ export async function rejectRequest(req: Request, res: Response) {
 }
 
 export const getRequestsFaculty = async (req: Request, res: Response) => {
+    console.log("endpoint reached - getRequestsFaculty");
+
     try {
         const user: any = (req as any).user;
-        if (!user?.role || !user?.id)
-            return res.status(401).json({ message: 'Unauthorized' });
+        console.log("Authenticated user:", user);
 
-        if (user.role !== 'facultyadv') {
-            return res
-                .status(403)
-                .json({ message: 'Only faculty advisors can access this' });
+        if (!user?.role || !user?.id) {
+            return res.status(401).json({ message: "Unauthorized" });
         }
 
-        const requests = await NoDueReq.find({
-            'facultyAdvisorApproval.approverId': user.id,
-        })
-            .sort({ createdAt: -1 })
-            .lean();
+        if (user.role !== "facultyadv") {
+            return res.status(403).json({ message: "Only faculty advisors can access this" });
+        }
 
-        return res.status(200).json({ requests });
-    } catch (err) {
-        return res.status(500).json({ message: 'Failed to fetch requests' });
+        // Convert user.id safely to ObjectId if possible
+        let userId: mongoose.Types.ObjectId | string = user.id;
+        if (mongoose.Types.ObjectId.isValid(user.id)) {
+            userId = new mongoose.Types.ObjectId(user.id);
+        } else {
+            // leave as string if not a valid ObjectId (won't crash)
+            console.warn("user.id is not a valid ObjectId:", user.id);
+        }
+
+        // Fetch pending and completed separately to mirror deptrep behaviour
+        let pending_requests = [] as any[];
+        let completed_requests = [] as any[];
+
+        try {
+            pending_requests = await NoDueReq.find({
+                'facultyAdvisorApproval.approverId': userId,
+                'facultyAdvisorApproval.status': 'Pending',
+            })
+                .sort({ createdAt: -1 })
+                .lean();
+        } catch (err) {
+            console.error("Error fetching pending_requests:", err);
+            throw err;
+        }
+
+        try {
+            completed_requests = await NoDueReq.find({
+                'facultyAdvisorApproval.approverId': userId,
+                'facultyAdvisorApproval.status': { $ne: 'Pending' },
+            })
+                .sort({ createdAt: -1 })
+                .lean();
+        } catch (err) {
+            console.error("Error fetching completed_requests:", err);
+            throw err;
+        }
+
+        console.log("DB queries done. counts:", pending_requests.length, completed_requests.length);
+
+        return res.status(200).json({ pending_requests, completed_requests });
+    } catch (err: any) {
+        console.error("getRequestsFaculty failed:", err);
+        return res.status(500).json({ message: "Failed to fetch requests", error: err.message });
     }
 };
 
 export const getRequestsDeptRep = async (req: Request, res: Response) => {
-    console.log("endpoint reached");
-    
-    try {
-        const user: any = (req as any).user;
-        if (!user?.role || !user?.id)
-            return res.status(401).json({ message: 'Unauthorized' });
+  console.log("endpoint reached - getRequestsDeptRep");
 
-        if (user.role !== 'deptrep') {
-            return res.status(403).json({
-                message: 'Only department representatives can access this',
-            });
-        }
+  try {
+    const user: any = (req as any).user;
+    console.log("Authenticated user:", user);
 
-        const pending_requests = await NoDueReq.find({
-            departmentApprovals: {
-                $elemMatch: { approverId: user.id, status: 'Pending' },
-            },
-        })
-            .sort({ createdAt: -1 })
-            .lean();
-        const completed_requests = await NoDueReq.find({
-            departmentApprovals: {
-                $elemMatch: { approverId: user.id, status: { $ne: 'Pending' } },
-            },
-        })
-            .sort({ createdAt: -1 })
-            .lean();
-
-        console.log({ pending_requests, completed_requests });
-
-        return res.status(200).json({ pending_requests, completed_requests });
-    } catch (err) {
-        console.log(err);
-        
-        return res.status(500).json({ message: 'Failed to fetch requests' });
+    if (!user?.role || !user?.id) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
+
+    if (user.role !== "deptrep") {
+      return res.status(403).json({ message: "Only department representatives can access this" });
+    }
+
+    // Convert user.id safely to ObjectId if possible
+    let userId: mongoose.Types.ObjectId | string = user.id;
+    if (mongoose.Types.ObjectId.isValid(user.id)) {
+      userId = new mongoose.Types.ObjectId(user.id);
+    } else {
+      // leave as string if not a valid ObjectId (won't crash)
+      console.warn("user.id is not a valid ObjectId:", user.id);
+    }
+
+    // Wrap each find with try/catch to isolate possible CastErrors
+    let pending_requests = [];
+    let completed_requests = [];
+
+    try {
+      pending_requests = await NoDueReq.find({
+        departmentApprovals: { $elemMatch: { approverId: userId, status: "Pending" } },
+      })
+        .sort({ createdAt: -1 })
+        .lean();
+    } catch (err) {
+      console.error("Error fetching pending_requests:", err);
+      throw err; // rethrow to be caught by outer catch
+    }
+
+    try {
+      completed_requests = await NoDueReq.find({
+        departmentApprovals: { $elemMatch: { approverId: userId, status: { $ne: "Pending" } } },
+      })
+        .sort({ createdAt: -1 })
+        .lean();
+    } catch (err) {
+      console.error("Error fetching completed_requests:", err);
+      throw err;
+    }
+
+    console.log("DB queries done. counts:", pending_requests.length, completed_requests.length);
+
+    return res.status(200).json({ pending_requests, completed_requests });
+  } catch (err: any) {
+    console.error("getRequestsDeptRep failed:", err);
+    // return a clear message and status code
+    return res.status(500).json({ message: "Failed to fetch requests", error: err.message });
+  }
 };
 
 export const reopenRequest = async (req: Request, res: Response) => {

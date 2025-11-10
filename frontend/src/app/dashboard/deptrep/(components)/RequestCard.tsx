@@ -5,23 +5,23 @@ import ApproveDialog from "@/components/ApproveDialog";
 import RejectDialog from "@/components/RejectDialog";
 import { getCurrentUser, getSession } from "@/lib/auth";
 import { IDeptRep, IFacultyAdvisor, INoDueReq, IStudent } from "@/types/types";
-import { useDeptRepRequests } from "../(hooks)/useDeptRepRequests";
 import { toast } from "sonner";
 import axios from "axios";
 
 export default function RequestCard({
   request,
+  refresh,
 }: {
   request: INoDueReq & {
     studentData: IStudent;
     _id: string;
   };
+  refresh: () => Promise<void>;
 }) {
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [currentUser, setCurrentUser] = useState<
     IStudent | IFacultyAdvisor | IDeptRep | null
   >(null);
-  const { refresh } = useDeptRepRequests();
 
   const [showApproveDialog, setShowApproveDialog] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
@@ -82,6 +82,8 @@ export default function RequestCard({
         return <Clock className="w-5 h-5 text-amber-500" />;
       case "fa approved":
         return <CheckCircle2 className="w-5 h-5 text-green-500" />;
+      case "approved":
+        return <CheckCircle2 className="w-5 h-5 text-green-500" />;
       case "rejected":
         return <XCircle className="w-5 h-5 text-red-500" />;
       default:
@@ -104,19 +106,27 @@ export default function RequestCard({
     deptObj?.status === "Pending";
 
   const showEditButton =
-    (String(request?.status ?? "").toLowerCase() === "fa approved" ||String(request?.status ?? "").toLowerCase() === "rejected") &&
+    (String(request?.status ?? "").toLowerCase() === "fa approved" ||
+      String(request?.status ?? "").toLowerCase() === "rejected") &&
     deptObj?.status !== "Pending";
 
   return (
     <div className="bg-card border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-muted">
+          <div className="flex items-center gap-3 mb-2 flex-wrap">
+            <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-background-muted">
               {getStatusIcon(request.status)}
               <span className="text-sm font-medium text-foreground">
                 {/* {getStatusLabel(request.status)} */}
                 {request.status}
+              </span>
+            </div>
+            <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-background-muted">
+              {getStatusIcon(deptObj?.status)}
+              <span className="text-sm font-medium text-foreground">
+                {/* {getStatusLabel(request.status)} */}
+                {currentUser?.department + " " + deptObj?.status}
               </span>
             </div>
           </div>
@@ -164,9 +174,15 @@ export default function RequestCard({
                 <p className="text-xs text-foreground-muted uppercase tracking-wide">
                   Rejection reason
                 </p>
-                <p className="text-foreground font-medium">
+                {/* <p className="text-foreground font-medium">
                   {deptObj?.rejectionReason ?? "-"}
-                </p>
+                </p> */}
+                <textarea
+                  disabled
+                  className="w-full px-3 py-2 border border-border rounded-lg bg-muted text-foreground-muted cursor-not-allowed resize-none"
+                  rows={2}
+                  defaultValue={deptObj?.rejectionReason ?? "-"}
+                />
               </div>
             )}
           </div>

@@ -4,7 +4,7 @@ import RequestCard from "../(components)/RequestCard";
 import { useDeptRepRequests } from "../(hooks)/useDeptRepRequests";
 
 export default function RequestsTab() {
-  const { data, isLoading, isFetching } = useDeptRepRequests();
+  const { data, isLoading, isFetching, error, refresh } = useDeptRepRequests();
 
   if (isLoading)
     return (
@@ -13,6 +13,13 @@ export default function RequestsTab() {
         Loading...
       </div>
     );
+
+  if(error)
+    return(
+      <div className="min-h-screen w-full flex justify-center items-center gap-2">
+        {error.toString()}
+      </div>
+    )
 
   return (
     <main className="flex-1 overflow-y-auto">
@@ -27,7 +34,7 @@ export default function RequestsTab() {
             {data.pending_requests
               .filter((req) => "studentData" in req)
               .map((req) => (
-                <RequestCard key={req._id} request={req} />
+                <RequestCard key={req._id} request={req} refresh={refresh}/>
               ))}
           </div>
         ) : (
@@ -58,7 +65,7 @@ export default function RequestsTab() {
             {data.completed_requests
               .filter((req) => "studentData" in req)
               .map((req) => (
-                <RequestCard key={req._id} request={req} />
+                <RequestCard key={req._id} request={req} refresh={refresh}/>
               ))}
           </div>
         ) : (
