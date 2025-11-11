@@ -3,7 +3,7 @@ dotenv.config();
 import app from './app';
 import config from './config/config';
 import { connectDB } from "./db";
-import { seedStudents, seedFacultyAdvisors, seedDepartmentRepresentatives } from './tests/authTest';
+import { seedStudents, seedFacultyAdvisors, seedDepartmentRepresentatives, seedAdmin } from './tests/authTest';
 
 
 const startServer = async () => {
@@ -12,6 +12,7 @@ const startServer = async () => {
     // await seedStudents();
     // await seedFacultyAdvisors();
     // await seedDepartmentRepresentatives();
+    // await seedAdmin();
 
     app.listen(config.port, () => {
       console.log(`🚀 Server running on port ${config.port}`);

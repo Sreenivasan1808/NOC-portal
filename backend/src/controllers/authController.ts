@@ -5,6 +5,7 @@ import DepartmentRepresentative from '../models/departmentRepresentative';
 import sendEmail from '../utils/sendEmail';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import Admin from '../models/admin';
 
 export const forgotPassword = async (req: Request, res: Response) => {
     try {
@@ -131,6 +132,10 @@ export const handleLogin = async (req: Request, res: Response) => {
         role = 'deptrep';
     }
     if (!user) {
+        user = await Admin.findOne(query);
+        role = 'admin';
+    }
+    if (!user) {
         return res.status(401).json({ message: 'Invalid credentials.' });
     }
     const valid = await bcrypt.compare(password, user.passwordHash);
@@ -150,6 +155,7 @@ export const handleLogin = async (req: Request, res: Response) => {
         session: token,
     });
 };
+
 export const changePassword = async (req: Request, res: Response) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -225,9 +231,9 @@ export const getUser = async (req: Request, res: Response) => {
         } else if (role === 'deptrep') {
             user = await DepartmentRepresentative.findById(id);
         }
-        //  else if(role === 'admin'){
-            
-        // }
+         else if(role === 'admin'){
+            user = await Admin.findById(id);
+        }
 
         console.log(user);
         
