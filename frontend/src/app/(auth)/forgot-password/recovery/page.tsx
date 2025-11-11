@@ -4,6 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import axios from "axios";
 
 const ForgotPassForm = () => {
   const router = useRouter();
@@ -22,21 +23,17 @@ const ForgotPassForm = () => {
 
     try {
       // Call your Next.js API route
-      const res = await fetch("/api/send-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username }),
-      });
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/forgot-password`, {username})
 
-      const data = await res.json();
+      const data = response.data;
 
-      if (!res.ok) {
+      if (response.status !== 200) {
         toast.error(data.error || "Failed to send OTP");
         return;
       }
 
       toast.success("OTP has been sent to your institute mail");
-      router.push(`/verify-otp?username=${encodeURIComponent(username)}`);
+      router.push(`/forgot-password/verify-otp?username=${encodeURIComponent(username)}`);
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong. Please try again.");

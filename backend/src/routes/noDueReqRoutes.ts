@@ -1,6 +1,15 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import { authenticateJWT } from '../middlewares/jwtAuth';
-import { getStudentRequests, createNewRequest, approveRequest, rejectRequest, getRequestsFaculty, getRequestsDeptRep } from '../controllers/noDueReqController';
+import {
+    getStudentRequests,
+    createNewRequest,
+    approveRequest,
+    rejectRequest,
+    getRequestsFaculty,
+    getRequestsDeptRep,
+    reopenRequest,
+    getRequestById
+} from '../controllers/noDueReqController';
 
 const router = express.Router();
 
@@ -11,8 +20,8 @@ router.post('/:reqId/reject', authenticateJWT, rejectRequest);
 router.get('/student/:rollNumber', authenticateJWT, getStudentRequests);
 router.get('/faculty', authenticateJWT, getRequestsFaculty);
 router.get('/deptrep', authenticateJWT, getRequestsDeptRep);
-router.post("/", authenticateJWT, createNewRequest);
+router.put('/reopen/:reqid', authenticateJWT, reopenRequest);
+router.get('/:reqid', authenticateJWT, getRequestById);
+router.post('/', authenticateJWT, createNewRequest);
 
 export default router;
-
-

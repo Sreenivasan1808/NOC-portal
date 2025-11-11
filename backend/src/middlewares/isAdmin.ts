@@ -1,13 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
-interface AuthenticatedRequest extends Request {
-    user?: {
-        id: string;
-        email: string;
-        role: string;
-    };
-}
+
 export function isAdmin(
-    req: AuthenticatedRequest,
+    req: Request & { user?: { role: string } },
     res: Response,
     next: NextFunction,
 ) {

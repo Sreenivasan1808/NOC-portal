@@ -4,6 +4,7 @@ import DepartmentRepresentative from "../models/departmentRepresentative";
 
 import bcrypt from "bcrypt";
 import { AcademicDeptPrograms, DEPARTMENTS } from "../constants";
+import Admin from "../models/admin";
 
 const ALL_DEPARTMENTS: string[] = [
   ...DEPARTMENTS.academic,
@@ -55,7 +56,7 @@ const studentData = [
   {
     name: "Aditya Verma",
     rollNumber: "ECE2023005",
-    email: "aditya.verma@university.edu",
+    email: "sreeniezio18@gmail.com",
     facultyAdvisorName: "Dr. Anil Deshpande",
     department: "ECE",
     program: AcademicDeptPrograms.ECE?.[0],
@@ -173,6 +174,12 @@ const facultyAdvisorData = [
   },
 ];
 
+const adminData = [{
+  name: "Super Admin",
+  email: "superadmin@gmail.com",
+  password: "SuperAdmin@123"
+}];
+
 export const departmentRepresentativeData = ALL_DEPARTMENTS.map(
   (dept, index) => ({
     name: `Dept Rep ${dept}`,
@@ -227,6 +234,23 @@ export const seedFacultyAdvisors = async () => {
     console.error("❌ Error seeding faculty advisors:", error);
   }
 };
+
+export const seedAdmin = async () => {
+  try {
+    const admin = new Admin({
+      name: adminData[0]?.name,
+      email: adminData[0]?.email
+    })
+
+    admin.passwordHash = await bcrypt.hash(adminData[0]?.password ?? "", 10);
+
+    await admin.save();
+    console.log("🎉 Successfully inserted admin record!");
+  } catch (error) {
+    console.log(error);
+    
+  }
+}
 
 export const seedDepartmentRepresentatives = async () => {
   try {

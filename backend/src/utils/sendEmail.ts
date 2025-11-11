@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { SentMessageInfo } from 'nodemailer/lib/smtp-transport';
 
 const sendEmail = async ({
   to,
@@ -10,7 +11,7 @@ const sendEmail = async ({
   text: string;
 }) => {
   const transporter = nodemailer.createTransport({
-    host: "smtp.office365.com", // Outlook SMTP host
+    host: "smtp.outlook.com", // Outlook SMTP host
     port: 587,
     secure: false, // use STARTTLS
     auth: {
@@ -19,6 +20,7 @@ const sendEmail = async ({
     },
     tls: {
       ciphers: 'SSLv3',
+      rejectUnauthorized:false
     },
   });
 
@@ -29,7 +31,13 @@ const sendEmail = async ({
     text,
   });
 
-  console.log(`✅ Email sent to ${to}`);
+  console.log(`✅ Email sent to ${to}`, (error: any, info: SentMessageInfo) => {
+      if (error) {
+        return console.log("Mail error: ",error);
+      }
+      console.log('Message sent: %s', info.messageId);
+      console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+    });
 };
 
 export default sendEmail;
