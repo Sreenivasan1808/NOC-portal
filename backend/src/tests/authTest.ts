@@ -56,7 +56,7 @@ const studentData = [
   {
     name: "Aditya Verma",
     rollNumber: "ECE2023005",
-    email: "aditya.verma@university.edu",
+    email: "sreeniezio18@gmail.com",
     facultyAdvisorName: "Dr. Anil Deshpande",
     department: "ECE",
     program: AcademicDeptPrograms.ECE?.[0],
