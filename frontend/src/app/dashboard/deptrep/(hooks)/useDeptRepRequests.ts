@@ -3,7 +3,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getSession } from "@/lib/auth";
 import axios from "axios";
-import { INoDueReq, IStudent } from "@/types/types";
+import { INoDueReq } from "@/types/types";
 
 export const useDeptRepRequests = () => {
   const queryClient = useQueryClient();

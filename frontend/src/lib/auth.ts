@@ -49,7 +49,9 @@ export async function getCurrentUser() {
     return response.data.user;
   } catch (err) {
     // session expired or invalid
-    return null;
+    console.log(err);
+     
+    return err;
   }
 }
 
