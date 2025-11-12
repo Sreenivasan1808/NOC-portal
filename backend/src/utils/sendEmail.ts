@@ -11,17 +11,17 @@ const sendEmail = async ({
   text: string;
 }) => {
   const transporter = nodemailer.createTransport({
-    host: "smtp.outlook.com", // Outlook SMTP host
-    port: 587,
-    secure: false, // use STARTTLS
+    host: "smtp.gmail.com", // Outlook SMTP host
+    port: 465,
+    secure: true, // use STARTTLS
     auth: {
       user: process.env.EMAIL_USER, // your Outlook email
       pass: process.env.EMAIL_PASS, // your Outlook password or app password
     },
-    tls: {
-      ciphers: 'SSLv3',
-      rejectUnauthorized:false
-    },
+    // tls: {
+    //   ciphers: 'SSLv3',
+    //   rejectUnauthorized:false
+    // },
   });
 
   await transporter.sendMail({

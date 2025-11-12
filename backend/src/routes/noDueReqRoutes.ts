@@ -8,8 +8,10 @@ import {
     getRequestsFaculty,
     getRequestsDeptRep,
     reopenRequest,
-    getRequestById
+    getRequestById,
+    getRequestsFiltered
 } from '../controllers/noDueReqController';
+import { isAdmin } from '../middlewares/isAdmin';
 
 const router = express.Router();
 
@@ -23,5 +25,7 @@ router.get('/deptrep', authenticateJWT, getRequestsDeptRep);
 router.put('/reopen/:reqid', authenticateJWT, reopenRequest);
 router.get('/:reqid', authenticateJWT, getRequestById);
 router.post('/', authenticateJWT, createNewRequest);
+//@ts-ignore
+router.get('/', authenticateJWT, isAdmin, getRequestsFiltered);
 
 export default router;

@@ -1,86 +1,79 @@
-"use client"
+import { fetchRequestsAction } from "./actions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search, Users } from "lucide-react";
+import { Clock, CheckCircle2, XCircle } from "lucide-react";
+import { UploadSection } from "./upload-section";
+import Navbar from "@/components/navbar";
+import { IDepartmentApproval, INoDueReq, IStudent } from "@/types/types";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Search, ChevronLeft, ChevronRight, CheckCircle, Clock, XCircle, Users } from "lucide-react"
-import { UploadSection } from "./upload-section"
-import Navbar from "@/components/navbar"
+type SearchParams = {
+  page?: string;
+  limit?: string;
+  q?: string;
+  status?: string;
+  department?: string;
+};
 
-const mockRequests = [
-  {
-    id: 1,
-    name: "John Doe",
-    rollNo: "CS2025001",
-    department: "Computer Science",
-    program: "B.Tech - CSE",
-    advisor: "Dr. Smith",
-    status: "pending",
-    approvals: [
-      { role: "Faculty Advisor", status: "approved", comment: "All coursework verified" },
-      { role: "Library", status: "pending", comment: "" },
-      { role: "Accounts", status: "rejected", comment: "Pending dues" },
-      { role: "Hostel", status: "pending", comment: "" },
-    ],
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    rollNo: "EC2025005",
-    department: "Electronics",
-    program: "M.Tech - VLSI",
-    advisor: "Dr. Johnson",
-    status: "rejected",
-    approvals: [{ role: "Faculty Advisor", status: "rejected", comment: "Pending dues" }],
-  },
-  {
-    id: 3,
-    name: "Raj Kumar",
-    rollNo: "ME2025012",
-    department: "Mechanical",
-    program: "B.Tech - ME",
-    advisor: "Prof. Williams",
-    status: "approved",
-    approvals: [
-      { role: "Faculty Advisor", status: "approved", comment: "All coursework verified" },
-      { role: "Library", status: "approved", comment: "Books returned" },
-      { role: "Accounts", status: "approved", comment: "No dues" },
-      { role: "Hostel", status: "approved", comment: "Room cleared" },
-    ],
-  },
-]
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const page = Math.max(
+    1,
+    Number.parseInt(String((await searchParams).page ?? "1"), 10) || 1
+  );
+  const limit = Math.min(
+    100,
+    Math.max(1, Number.parseInt(String((await searchParams).limit ?? "10"), 10) || 10)
+  );
+  const q = (await searchParams).q?.trim() || "";
+  const status = (await searchParams).status || "";
+  const department = (await searchParams).department || "";
 
-export default function AdminDashboard() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedDept, setSelectedDept] = useState("all")
-  const [currentPage, setCurrentPage] = useState(1)
+  const res = await fetchRequestsAction({
+    page,
+    limit,
+    q: q || undefined,
+    status: status || undefined,
+    department: department || undefined,
+  });
 
-  const filteredRequests = mockRequests.filter((req) => {
-    const matchesSearch =
-      req.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      req.rollNo.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesDept = selectedDept === "all" || req.department === selectedDept
-    return matchesSearch && matchesDept
-  })
+  type itemType = INoDueReq & {_id:string, studentData: IStudent}
+  const items: itemType[] =  res.data?.items ?? [];
+  const total = res.ok ? res.data?.total : 0;
+  const totalPages = res.ok ? res.data?.totalPages : 1;
 
-  const itemsPerPage = 5
-  const totalPages = Math.ceil(filteredRequests.length / itemsPerPage)
-  const paginatedRequests = filteredRequests.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+  const getStatusIcon = (status: string | undefined) => {
+    const s = (status ?? "").toString().toLowerCase();
+    switch (s) {
+      case "pending":
+        return <Clock className="w-4 h-4 text-amber-500" />;
+      case "fa approved":
+      case "approved":
+        return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+      case "rejected":
+        return <XCircle className="w-4 h-4 text-red-500" />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <Navbar/>
+      <Navbar />
       <div className="border-b border-border bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center gap-3 mb-2">
             <Users className="w-8 h-8 text-primary" />
-            <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
+            <h1 className="text-3xl font-bold text-foreground">
+              Admin Dashboard
+            </h1>
           </div>
-          <p className="text-foreground-muted">Manage and track student clearance requests across all departments</p>
+          <p className="text-foreground-muted">
+            Manage and track student clearance requests across all departments
+          </p>
         </div>
       </div>
 
@@ -91,173 +84,179 @@ export default function AdminDashboard() {
         {/* Requests Section */}
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">All Requests</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-2">
+              All Requests
+            </h2>
             <p className="text-foreground-muted">
-              {filteredRequests.length} total request{filteredRequests.length !== 1 ? "s" : ""}
+              {total} total request{total !== 1 ? "s" : ""}
             </p>
           </div>
 
           {/* Search and Filter */}
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="md:col-span-2">
-              <div className="relative ">
-                <Search className="absolute left-3 top-3 w-4 h-4 text-foreground-muted " />
+          <form
+            method="get"
+            className="flex flex-col md:flex-row md:items-end md:justify-between gap-4"
+          >
+            <div className="flex-1">
+              <label className="block text-sm mb-1">Search</label>
+              <div className="relative border border-border rounded-md active:border-primary">
+                <Search className="absolute left-3 top-3 w-4 h-4 text-foreground-muted" />
                 <Input
-                  placeholder="Search by student name or roll number..."
-                  className="pl-10 bg-background border border-border"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value)
-                    setCurrentPage(1)
-                  }}
+                  name="q"
+                  defaultValue={q}
+                  placeholder="Search roll no or name..."
+                  className="pl-10 bg-background border border-border ring-border"
                 />
               </div>
             </div>
-            <Select
-              value={selectedDept}
-              onValueChange={(value) => {
-                setSelectedDept(value)
-                setCurrentPage(1)
-              }}
-            >
-              <SelectTrigger className="bg-background border-border">
-                <SelectValue placeholder="Filter by department" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Departments</SelectItem>
-                <SelectItem value="Computer Science">Computer Science</SelectItem>
-                <SelectItem value="Electronics">Electronics</SelectItem>
-                <SelectItem value="Mechanical">Mechanical</SelectItem>
-                <SelectItem value="Civil">Civil</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            <div>
+              <label className="block text-sm mb-1">Status</label>
+              <select
+                name="status"
+                defaultValue={status}
+                className="border rounded px-3 py-2 bg-background border-border"
+              >
+                <option value="">All</option>
+                <option value="Pending">Pending</option>
+                <option value="In Review">In Review</option>
+                <option value="Partially Approved">Partially Approved</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm mb-1">Department</label>
+              {/* <div className="border border-border rounded-md">
+                <Input
+                  name="department"
+                  defaultValue={department}
+                  placeholder="e.g. CSE"
+                  className="bg-background"
+                />
+              </div> */}
+              <select
+                name="department"
+                defaultValue={String(limit)}
+                className="border rounded px-3 py-2 bg-background border-border"
+              >
+                <option value="CSE">CSE</option>
+                <option value="Mech">Mech</option>
+                <option value="Civil">Civil</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm mb-1">Per page</label>
+              <select
+                name="limit"
+                defaultValue={String(limit)}
+                className="border rounded px-3 py-2 bg-background border-border"
+              >
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+            <Button type="submit" className="h-10">
+              Apply Filters
+            </Button>
+          </form>
 
-          {/* Request Cards */}
-          <div className="space-y-4">
-            {paginatedRequests.length > 0 ? (
-              paginatedRequests.map((request) => (
-                <Card key={request.id} className="border-border bg-card">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <CardTitle className="text-xl">{request.name}</CardTitle>
-                          <StatusBadge status={request.status} />
-                        </div>
-                        <CardDescription>Request ID: {request.id}</CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                      <div>
-                        <p className="text-foreground-muted font-medium">Department</p>
-                        <p className="text-foreground">{request.department}</p>
-                      </div>
-                      <div>
-                        <p className="text-foreground-muted font-medium">Roll No</p>
-                        <p className="text-foreground">{request.rollNo}</p>
-                      </div>
-                      <div>
-                        <p className="text-foreground-muted font-medium">Program</p>
-                        <p className="text-foreground">{request.program}</p>
-                      </div>
-                      <div>
-                        <p className="text-foreground-muted font-medium">Faculty Advisor</p>
-                        <p className="text-foreground">{request.advisor}</p>
-                      </div>
-                    </div>
-
-                    {/* Approvals Table */}
-                    <div className="mt-4 pt-4 border-t border-border">
-                      <p className="text-sm font-semibold text-foreground mb-3">Approval Status</p>
-                      <div className="space-y-2">
-                        {request.approvals.map((approval) => (
-                          <div
-                            key={approval.role}
-                            className="flex items-center justify-between py-2 px-3 rounded-lg bg-background"
-                          >
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-foreground">{approval.role}</p>
-                              {approval.comment && <p className="text-xs text-foreground-muted">{approval.comment}</p>}
+          {/* Results Table */}
+          <div className="bg-white dark:bg-card shadow rounded">
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead className="bg-secondary">
+                  <tr>
+                    <th className="px-4 py-2 text-left">Roll No</th>
+                    <th className="px-4 py-2 text-left">Student Name</th>
+                    <th className="px-4 py-2 text-left">Status</th>
+                    <th className="px-4 py-2 text-left">Created</th>
+                    <th className="px-4 py-2 text-left">Updated</th>
+                    <th className="px-4 py-2 text-left">Departments</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items?.length === 0 ? (
+                    <tr className="border-t dark:border-border bg-background-muted w-full">
+                      <td className="px-4 py-6 text-center" colSpan={6}>
+                        No requests found
+                      </td>
+                    </tr>
+                  ) : (
+                    items?.map((it) => (
+                      <tr
+                        className="border-t dark:border-border bg-background-muted"
+                        key={it._id}
+                      >
+                        <td className="px-4 py-2">{it.studentRollNumber}</td>
+                        <td className="px-4 py-2">{it.studentData.name}</td>
+                        <td className="px-4 py-2">{it.status}</td>
+                        <td className="px-4 py-2">
+                          {it.createdAt
+                            ? new Date(it.createdAt).toLocaleString()
+                            : "-"}
+                        </td>
+                        <td className="px-4 py-2">
+                          {it.updatedAt
+                            ? new Date(it.updatedAt).toLocaleString()
+                            : "-"}
+                        </td>
+                        <td className="px-4 py-2">
+                          {Array.isArray(it.departmentApprovals) &&
+                          it.departmentApprovals.length > 0 ? (
+                            <div className="flex flex-wrap gap-2">
+                              {it.departmentApprovals.map(
+                                (a: IDepartmentApproval, idx: number) => (
+                                  <div
+                                    key={idx}
+                                    className="flex items-center gap-1 px-2 py-1 rounded-full text-sm border border-border"
+                                  >
+                                    {getStatusIcon(a.status)}
+                                    <span>{a.department}</span>
+                                  </div>
+                                )
+                              )}
                             </div>
-                            <ApprovalStatusIcon status={approval.status} />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <Card className="border-border bg-card">
-                <CardContent className="py-12 text-center">
-                  <p className="text-foreground-muted">No requests found matching your filters</p>
-                </CardContent>
-              </Card>
-            )}
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="border-border"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </Button>
-
-              {Array.from({ length: totalPages }).map((_, i) => (
-                <Button
-                  key={i + 1}
-                  variant={currentPage === i + 1 ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={currentPage === i + 1 ? "" : "border-border"}
+          <div className="flex justify-center items-center gap-2">
+            {Array.from({ length: totalPages ?? 1 }, (_, i) => i + 1).map((p) => {
+              const params = new URLSearchParams({
+                page: String(p),
+                limit: String(limit),
+                ...(q ? { q } : {}),
+                ...(status ? { status } : {}),
+                ...(department ? { department } : {}),
+              });
+              return (
+                <a
+                  key={p}
+                  href={`?${params.toString()}`}
+                  className={`px-3 py-1 border rounded ${
+                    p === page
+                      ? "bg-accent text-white"
+                      : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                  }`}
                 >
-                  {i + 1}
-                </Button>
-              ))}
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                className="border-border"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            </div>
-          )}
+                  {p}
+                </a>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
-  )
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const statusConfig = {
-    approved: { label: "Approved", color: "bg-green-500/10 text-green-700 dark:text-green-400" },
-    pending: { label: "Pending", color: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400" },
-    rejected: { label: "Rejected", color: "bg-red-500/10 text-red-700 dark:text-red-400" },
-  }
-
-  const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending
-  return <Badge className={`${config.color} border-0`}>{config.label}</Badge>
-}
-
-function ApprovalStatusIcon({ status }: { status: string }) {
-  if (status === "approved") {
-    return <CheckCircle className="w-5 h-5 text-emerald-500" />
-  } else if (status === "rejected") {
-    return <XCircle className="w-5 h-5 text-destructive" />
-  } else {
-    return <Clock className="w-5 h-5 text-yellow-500" />
-  }
+  );
 }

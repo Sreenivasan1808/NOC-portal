@@ -10,6 +10,7 @@ const upload = multer({ dest: 'uploads/' });
 router.post(
   '/upload/:type',
   authenticateJWT,
+  //@ts-ignore
   isAdmin, 
   upload.single('file'),
   uploadCsv

@@ -113,7 +113,7 @@ export default async function AdminRequestsPage({ searchParams }: { searchParams
             ...(department ? { department } : {}),
           });
           return (
-            <a key={p} href={`?${params.toString()}`} className={`px-3 py-1 border rounded ${p === page ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'}`}>
+            <a key={p} href={`?${params.toString()}`} className={`px-3 py-1 border rounded ${p === page ? 'bg-accent text-white' : 'hover:bg-gray-100'}`}>
               {p}
             </a>
           );
