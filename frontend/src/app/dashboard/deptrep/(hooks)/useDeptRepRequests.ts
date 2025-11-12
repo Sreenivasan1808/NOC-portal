@@ -22,6 +22,7 @@ export const useDeptRepRequests = () => {
         { headers: { Authorization: `Bearer ${session}` } }
       );
 
+
       console.log(data);
       console.log("Data retrieved");
       

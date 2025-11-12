@@ -1,0 +1,11 @@
+name,rollNumber,email,facultyAdvisorName,department,program,password,hosteler
+Tanvi Nair,CSE2023011,tanvi.nair@university.edu,Dr. Meera Nair,CSE,M.Tech in Computer Science and Engineering (Artificial Intelligence and Data Analytics),tanviAI@2023,false
+Rahul Mehta,ECE2023012,rahul.mehta@university.edu,Dr. Anil Deshpande,ECE,M.Tech in VLSI Design,rahulVLSI,true
+Arjun Das,EEE2023013,arjun.das@university.edu,Prof. Kavita Joshi,EEE,M.Tech in Power Systems,arjunEE@1,false
+Meera Iyer,ME2023014,meera.iyer@university.edu,Dr. S. Iyer,ME,M.Tech in Thermal Engineering,meeraTherm@22,true
+Lakshmi Rao,CE2023015,lakshmi.rao@university.edu,Dr. R. Balasubramanian,CE,M.Tech in Structural Engineering,lakshmiCiv@9,false
+Ritesh Gupta,CSE2023016,ritesh.gupta@university.edu,Dr. Meera Nair,CSE,Ph.D. in Computer Science and Engineering,riteshPhD,true
+Sanya Kapoor,ECE2023017,sanya.kapoor@university.edu,Dr. N. Suresh,ECE,B.Tech in Electronics and Communication Engineering,sanyaEce#45,false
+Vivek Menon,EEE2023018,vivek.menon@university.edu,Dr. R. Krishnan,EEE,B.Tech in Electrical and Electronics Engineering,vivekEEE@2023,true
+Anjali Thomas,ME2023019,anjali.thomas@university.edu,Dr. S. Iyer,ME,Ph.D. in Mechanical Engineering,anjaliPhD@me,false
+Rohit Pillai,CE2023020,rohit.pillai@university.edu,Dr. Alok Mishra,CE,B.Tech in Civil Engineering,rohitCiv@123,true
