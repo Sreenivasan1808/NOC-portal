@@ -1,6 +1,5 @@
 import React from "react";
 import Image from "next/image";
-import ForgotPassForm from "./recovery/page";
 
 const ForgotPassword = ({
   children,

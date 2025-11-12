@@ -7,7 +7,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useRequestDetails } from "./hooks";
-import { INoDueReq, IDepartmentApproval, IFacultyAdvisorApproval } from "@/types/types"; // ✅ Ensure correct import
+import { IDepartmentApproval, IFacultyAdvisorApproval } from "@/types/types"; // ✅ Ensure correct import
 import { use } from "react";
 
 // ✅ Helpers
