@@ -40,7 +40,7 @@ async function seedDatabase() {
   } catch (error) {
     console.error("❌ Error seeding data:", error);
   } finally {
-    // await mongoose.disconnect();
+    await mongoose.disconnect();
     console.log("🔌 Disconnected from MongoDB");
   }
 }

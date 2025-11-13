@@ -28,6 +28,10 @@ app.use(
 
 
 
+//sample route to test the server. Remove later
+app.get('/', (req: Request, res: Response) => {
+  res.status(200).send('Hello from server');
+});
 
 
 app.use("/api/auth", authRoutes);
@@ -35,12 +39,6 @@ app.use('/api/admin', adminRoutes);
 app.use("/api/requests", noDueReqRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/faculty", facultyRoutes);
-
-//sample route to test the server. Remove later
-app.get('/', (req: Request, res: Response) => {
-  res.status(200).send('Hello from server');
-});
-
 
 app.use(errorHandler);
 
