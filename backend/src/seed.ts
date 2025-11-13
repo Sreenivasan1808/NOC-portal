@@ -8,7 +8,7 @@ dotenv.config();
 
 const MONGO_URI = process.env.MONGO_URI || "";
 
-async function seedDatabase() {
+export async function seedDatabase() {
   try {
     // Connect if not already connected
     if (mongoose.connection.readyState === 0) {
@@ -39,10 +39,7 @@ async function seedDatabase() {
     }
   } catch (error) {
     console.error("❌ Error seeding data:", error);
-  } finally {
-    // await mongoose.disconnect();
-    console.log("🔌 Disconnected from MongoDB");
-  }
+  } 
 }
 
-seedDatabase();
+
