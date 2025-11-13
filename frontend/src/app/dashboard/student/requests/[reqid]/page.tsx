@@ -83,9 +83,9 @@ export default function RequestDetails({
     return <div className="text-center py-10 text-foreground-muted">Request not found.</div>;
   }
 
-  const approvedCount = data.departmentApprovals?.filter((d) => d.status === "Approved").length;
-  const rejectedCount = data.departmentApprovals?.filter((d) => d.status === "Rejected").length;
-  const pendingCount = data.departmentApprovals?.filter((d) => d.status === "Pending").length;
+  const approvedCount = data.departmentApprovals?.filter((d) => d.status === "Approved").length + Number(data.facultyAdvisorApproval.status === "Approved");
+  const rejectedCount = data.departmentApprovals?.filter((d) => d.status === "Rejected").length + Number(data.facultyAdvisorApproval.status === "Rejected");
+  const pendingCount = data.departmentApprovals?.filter((d) => d.status === "Pending").length + Number(data.facultyAdvisorApproval.status === "Pending");
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
@@ -143,6 +143,7 @@ export default function RequestDetails({
               <p className="text-sm text-foreground-muted">
                 {formatDate(data.facultyAdvisorApproval.date)}
               </p>
+              <p className="text-sm text-foreground">{data.facultyAdvisorApproval.rejectionReason}</p>
             </div>
           </div>
           <div
