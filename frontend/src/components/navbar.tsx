@@ -69,7 +69,7 @@ export default function Navbar() {
             <div className="p-1 absolute right-0 mt-2 min-w-fit md:w-64 bg-background border border-background-muted rounded-lg shadow-lg animate-in fade-in-0 zoom-in-95 z-50">
               <ChangePassword onOpenChange={setDialogOpen} />
               <button
-                className="flex px-4 py-2 hover:text-foreground/80 hover:bg-background-muted rounded-lg w-full text-start gap-2"
+                className="flex px-4 py-2 hover:text-foreground/80 hover:bg-background-muted rounded-lg w-full text-start gap-2 hover:cursor-pointer"
                 onClick={handleLogout}
               >
                 <LogOut />
