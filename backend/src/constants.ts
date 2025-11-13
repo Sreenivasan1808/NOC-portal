@@ -1,31 +1,78 @@
 export const AcademicDeptPrograms: Record<string, string[]> = {
-    CSE: [
-        'B.Tech in Computer Science and Engineering',
-        'M.Tech in Computer Science and Engineering',
-        'M.Tech in Computer Science and Engineering (Information Security)',
-        'M.Tech in Computer Science and Engineering (Artificial Intelligence and Data Analytics)',
-        'Ph.D. in Computer Science and Engineering',
+    'Architecture and Planning': [
+        'Bachelor of Architecture (B.Arch.)',
+        'Master of Planning (Urban Planning) (M.Plan.)',
+        'Ph.D.',
     ],
-    ECE: [
-        'B.Tech in Electronics and Communication Engineering',
-        'M.Tech in VLSI Design',
-        'Ph.D. in Electronics and Communication Engineering',
+    'Bioscience and Engineering': [
+        'B.Tech Biotechnology',
+        'M.Tech Bioengineering',
+        'Ph.D.',
     ],
-    EEE: [
-        'B.Tech in Electrical and Electronics Engineering',
-        'M.Tech in Power Systems',
-        'Ph.D. in Electrical and Electronics Engineering',
+    'Chemical Engineering': [
+        'B.Tech Chemical Engineering',
+        'M.Tech Chemical Engineering',
+        'Ph.D.',
     ],
-    ME: [
-        'B.Tech in Mechanical Engineering',
-        'M.Tech in Thermal Engineering',
-        'Ph.D. in Mechanical Engineering',
+    Chemistry: ['M.Sc. Chemistry', 'Ph.D.'],
+    'Civil Engineering': [
+        'B.Tech Civil Engineering',
+        'M.Tech Environmental Engineering',
+        'M.Tech Water Resources Engineering',
+        'M.Tech Offshore Structures',
+        'M.Tech Geotechnical Engineering',
+        'M.Tech Traffic and Transportation Planning',
+        'M.Tech Structural Engineering',
+        'Ph.D.',
     ],
-    CE: [
-        'B.Tech in Civil Engineering',
-        'M.Tech in Structural Engineering',
-        'Ph.D. in Civil Engineering',
+    'Computer Science & Engineering': [
+        'B.Tech Computer Science & Engineering',
+        'M.Tech Computer Science & Engineering',
+        'M.Tech Computer Science & Engineering (Artificial Intelligence & Data Analytics)',
+        'M.Tech Computer Science & Engineering (Information Security)',
+        'Ph.D.',
     ],
+    'Department of Education': [
+        '4-year Integrated Teacher Education Programme (ITEP) B.Sc-B.Ed.',
+        'Ph.D.',
+    ],
+    'Electrical Engineering': [
+        'B.Tech Electrical & Electronics Engineering',
+        'M.Tech Electric Vehicle Engineering',
+        'M.Tech High Voltage Engineering',
+        'M.Tech Industrial Power & Automation',
+        'M.Tech Power Electronics',
+        'M.Tech Power Systems',
+        'M.Tech Instrumentation & Control Systems',
+        'Ph.D.',
+    ],
+    'Electronics & Communication Engineering': [
+        'B.Tech Electronics & Communication Engineering',
+        'M.Tech Telecommunication',
+        'M.Tech Signal Processing',
+        'M.Tech Microelectronics & VLSI Design',
+        'M.Tech Electronics Design & Technology',
+        'Ph.D.',
+    ],
+    'Humanities, Arts and Social Sciences': ['Ph.D.'],
+    'Materials Science and Engineering': [
+        'B.Tech Materials Science & Engineering',
+        'M.Tech Nanotechnology',
+        'M.Tech Materials Science & Technology',
+        'Ph.D.',
+    ],
+    Mathematics: ['M.Sc. Mathematics', 'Ph.D.'],
+    'Management Studies': ['Master of Business Administration (MBA)', 'Ph.D.'],
+    'Mechanical Engineering': [
+        'B.Tech Mechanical Engineering',
+        'M.Tech Thermal Sciences',
+        'M.Tech Manufacturing Technology',
+        'M.Tech Machine Design',
+        'M.Tech Industrial Engineering & Management',
+        'M.Tech Energy Engineering & Management',
+        'Ph.D.',
+    ],
+    Physics: ['M.Sc. Physics', 'Ph.D.'],
 };
 
 export const DEPARTMENTS = {
@@ -46,7 +93,6 @@ export const DEPARTMENTS = {
         'Mechanical Engineering',
         'Physics',
     ],
-
     nonAcademic: [
         'Library',
         'Hostel Administration',
