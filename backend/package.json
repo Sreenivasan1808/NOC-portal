@@ -9,7 +9,7 @@
         "start": "node dist/server.js",
         "dev": "nodemon",
         "lint": "eslint 'src/**/*.ts'",
-        "postinstall": "node dist/seed.js"
+        "seed": "node dist/seed.js"
     },
     "keywords": [],
     "author": "",

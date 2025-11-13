@@ -12,7 +12,7 @@ export default async function Login() {
   return (
     <div className="flex min-h-screen w-full">
       {/* Left Art Section */}
-      <div className="relative w-[50%] flex justify-center items-center">
+      <div className="hidden relative w-[50%] md:flex justify-center items-center">
         <Image
           src="/Dark-Art.svg"
           alt="Dark mode art"
@@ -28,7 +28,7 @@ export default async function Login() {
       </div>
 
       {/* Right Login Section */}
-      <div className="w-[50%] flex flex-col justify-center items-center gap-4 p-4"
+      <div className="w-full md:w-[50%] flex flex-col justify-center items-center gap-4 p-4"
       >
         <LoginForm />
       </div>
