@@ -6,6 +6,7 @@ import { Clock, CheckCircle2, XCircle } from "lucide-react";
 import { UploadSection } from "./upload-section";
 import Navbar from "@/components/navbar";
 import { IDepartmentApproval, INoDueReq, IStudent } from "@/types/types";
+import NewUser from "./newUser";
 
 type SearchParams = {
   page?: string;
@@ -26,7 +27,10 @@ export default async function AdminPage({
   );
   const limit = Math.min(
     100,
-    Math.max(1, Number.parseInt(String((await searchParams).limit ?? "10"), 10) || 10)
+    Math.max(
+      1,
+      Number.parseInt(String((await searchParams).limit ?? "10"), 10) || 10
+    )
   );
   const q = (await searchParams).q?.trim() || "";
   const status = (await searchParams).status || "";
@@ -40,8 +44,8 @@ export default async function AdminPage({
     department: department || undefined,
   });
 
-  type itemType = INoDueReq & {_id:string, studentData: IStudent}
-  const items: itemType[] =  res.data?.items ?? [];
+  type itemType = INoDueReq & { _id: string; studentData: IStudent };
+  const items: itemType[] = res.data?.items ?? [];
   const total = res.ok ? res.data?.total : 0;
   const totalPages = res.ok ? res.data?.totalPages : 1;
 
@@ -75,6 +79,10 @@ export default async function AdminPage({
             Manage and track student clearance requests across all departments
           </p>
         </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex justify-end">
+        <NewUser />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -118,11 +126,9 @@ export default async function AdminPage({
               >
                 <option value="">All</option>
                 <option value="Pending">Pending</option>
-                <option value="In Review">In Review</option>
                 <option value="Partially Approved">Partially Approved</option>
                 <option value="Approved">Approved</option>
                 <option value="Rejected">Rejected</option>
-                <option value="Cancelled">Cancelled</option>
               </select>
             </div>
             <div>
@@ -232,28 +238,30 @@ export default async function AdminPage({
 
           {/* Pagination */}
           <div className="flex justify-center items-center gap-2">
-            {Array.from({ length: totalPages ?? 1 }, (_, i) => i + 1).map((p) => {
-              const params = new URLSearchParams({
-                page: String(p),
-                limit: String(limit),
-                ...(q ? { q } : {}),
-                ...(status ? { status } : {}),
-                ...(department ? { department } : {}),
-              });
-              return (
-                <a
-                  key={p}
-                  href={`?${params.toString()}`}
-                  className={`px-3 py-1 border rounded ${
-                    p === page
-                      ? "bg-accent text-white"
-                      : "hover:bg-gray-100 dark:hover:bg-gray-800"
-                  }`}
-                >
-                  {p}
-                </a>
-              );
-            })}
+            {Array.from({ length: totalPages ?? 1 }, (_, i) => i + 1).map(
+              (p) => {
+                const params = new URLSearchParams({
+                  page: String(p),
+                  limit: String(limit),
+                  ...(q ? { q } : {}),
+                  ...(status ? { status } : {}),
+                  ...(department ? { department } : {}),
+                });
+                return (
+                  <a
+                    key={p}
+                    href={`?${params.toString()}`}
+                    className={`px-3 py-1 border rounded ${
+                      p === page
+                        ? "bg-accent text-white"
+                        : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                    }`}
+                  >
+                    {p}
+                  </a>
+                );
+              }
+            )}
           </div>
         </div>
       </div>

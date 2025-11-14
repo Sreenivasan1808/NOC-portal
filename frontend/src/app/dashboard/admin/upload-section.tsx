@@ -82,7 +82,7 @@ export function UploadSection() {
     <Card className="border-border bg-card">
       <CardHeader>
         <CardTitle>Upload CSV Data</CardTitle>
-        <CardDescription>Import CSV file with student requests</CardDescription>
+        <CardDescription>Import CSV file with student/faculty/representative data</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="mb-6">
