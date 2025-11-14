@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { uploadCsv } from '../controllers/adminController';
+import { uploadCsv, createNewUser } from '../controllers/adminController';
 import { authenticateJWT } from '../middlewares/jwtAuth';
 import { isAdmin } from '../middlewares/isAdmin';
 
@@ -15,5 +15,7 @@ router.post(
   upload.single('file'),
   uploadCsv
 );
+//@ts-ignore
+router.post("/user", authenticateJWT, isAdmin,  createNewUser);
 
 export default router;
